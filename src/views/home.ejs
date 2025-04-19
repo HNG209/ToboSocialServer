@@ -1,0 +1,104 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home page</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .table-container {
+            margin: 20px auto;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #ccc;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topnav">
+        <a class="active" href="/">Home</a>
+        <a href="/create">/create-user</a>
+    </div>
+    <div class="table-container">
+        <div class="title">List User</div>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>City</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% listUsers.forEach(user=> { %>
+                    <tr>
+                        <td>
+                            <%= user.id %>
+                        </td>
+                        <td>
+                            <%= user.email %>
+                        </td>
+                        <td>
+                            <%= user.name %>
+                        </td>
+                        <td>
+                            <%= user.city %>
+                        </td>
+                        <td>
+                            <a href="/update/<%= user.id %>">Edit</a>
+                            <form action="delete-user/<%= user.id %>" method="post">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+
+</body>
+
+</html>
