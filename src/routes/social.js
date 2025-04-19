@@ -13,6 +13,8 @@ const {
 } = require('../controllers/postController');
 const { register, login } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
+const { likePost, unlikePost } = require('../controllers/likeController');
+const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI } = require('../controllers/commentController');
 
 const routerAPI = express.Router()
 
@@ -42,5 +44,13 @@ routerAPI.post('/login', login);
 
 routerAPI.post('/users/:id/follow', followUser);
 routerAPI.post('/users/:id/unfollow', unfollowUser);
+
+routerAPI.post('/posts/:id/like', likePost);
+routerAPI.post('/posts/:id/unlike', unlikePost);
+
+routerAPI.post('/comments', postCreateComment);
+routerAPI.get('/comments', getAllComments);
+routerAPI.put('/comments', postUpdateComment);
+routerAPI.delete('/comments', deleteCommentAPI);
 
 module.exports = routerAPI
