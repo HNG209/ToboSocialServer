@@ -11,6 +11,7 @@ const {
     postUpdatePost,
     deletePostAPI
 } = require('../controllers/postController');
+const { register, login } = require('../controllers/authController');
 
 const routerAPI = express.Router()
 
@@ -34,5 +35,8 @@ routerAPI.post('/posts', postCreatePost);
 routerAPI.get('/posts', getAllPost);
 routerAPI.put('/posts', postUpdatePost);
 routerAPI.delete('/posts', deletePostAPI);
+
+routerAPI.post('/register', register);
+routerAPI.post('/login', login);
 
 module.exports = routerAPI
