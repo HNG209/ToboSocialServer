@@ -12,6 +12,7 @@ const {
     deletePostAPI
 } = require('../controllers/postController');
 const { register, login } = require('../controllers/authController');
+const { followUser, unfollowUser } = require('../controllers/followController');
 
 const routerAPI = express.Router()
 
@@ -38,5 +39,8 @@ routerAPI.delete('/posts', deletePostAPI);
 
 routerAPI.post('/register', register);
 routerAPI.post('/login', login);
+
+routerAPI.post('/users/:id/follow', followUser);
+routerAPI.post('/users/:id/unfollow', unfollowUser);
 
 module.exports = routerAPI
