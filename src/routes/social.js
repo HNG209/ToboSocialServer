@@ -15,6 +15,7 @@ const { register, login } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
 const { likePost, unlikePost } = require('../controllers/likeController');
 const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI } = require('../controllers/commentController');
+const { postCreateNotification, getAllNotifications, postUpdateNotification, deleteNotificationAPI } = require('../controllers/notificationController');
 
 const routerAPI = express.Router()
 
@@ -52,5 +53,10 @@ routerAPI.post('/comments', postCreateComment);
 routerAPI.get('/comments', getAllComments);
 routerAPI.put('/comments', postUpdateComment);
 routerAPI.delete('/comments', deleteCommentAPI);
+
+routerAPI.post('/notifications', postCreateNotification);
+routerAPI.get('/notifications', getAllNotifications);
+routerAPI.put('/notifications', postUpdateNotification);
+routerAPI.delete('/notifications', deleteNotificationAPI);
 
 module.exports = routerAPI
