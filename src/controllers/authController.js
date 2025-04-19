@@ -1,11 +1,17 @@
 const bcrypt = require('bcrypt');
+const { registerSchema, loginSchema } = require('../validations/authValidation');
 const User = require('../models/user');
 
 // Đăng ký
 const register = async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
+    const { error } = registerSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
 
+    const { username, email, password } = req.body;
+
+    try {
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
             return res.status(400).json({ error: 'Email hoặc username đã được sử dụng.' });
@@ -30,9 +36,14 @@ const register = async (req, res) => {
 
 // Đăng nhập
 const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+    const { error } = loginSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
 
+    const { email, password } = req.body;
+
+    try {
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ error: 'Email không đúng.' });
 
