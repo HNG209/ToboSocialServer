@@ -3,9 +3,10 @@ const express = require('express')
 const path = require('path')
 const configViewEngine = require("./config/viewEngine")
 const webRoutes = require("./routes/web")
-const apiRoutes = require("./routes/api")
+const apiRoutes = require("./routes/social")
 const fileUpload = require('express-fileupload')
 const { MongoClient } = require('mongodb');
+const cors = require('cors');
 
 const connection = require("./config/database")
 const { log } = require('console')
@@ -15,7 +16,7 @@ const app = express()
 const port = process.env.PORT || 8888
 const hostname = process.env.HOST_NAME
 
-
+app.use(cors());
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -27,10 +28,9 @@ configViewEngine(app)
 app.use(fileUpload());
 
 //khai bao route
-app.use('/', webRoutes);
+// app.use('/', webRoutes);
+// app.use('/v1/api', apiRoutes);
 app.use('/v1/api', apiRoutes);
-
-
 
 //test connection
 (async () => {
