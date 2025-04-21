@@ -16,6 +16,9 @@ const { followUser, unfollowUser } = require('../controllers/followController');
 const { likePost, unlikePost } = require('../controllers/likeController');
 const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI } = require('../controllers/commentController');
 const { postCreateNotification, getAllNotifications, postUpdateNotification, deleteNotificationAPI } = require('../controllers/notificationController');
+const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
+const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
+const { getUserPosts } = require('../controllers/profileController');
 
 const routerAPI = express.Router()
 
@@ -58,5 +61,16 @@ routerAPI.post('/notifications', postCreateNotification);
 routerAPI.get('/notifications', getAllNotifications);
 routerAPI.put('/notifications', postUpdateNotification);
 routerAPI.delete('/notifications', deleteNotificationAPI);
+
+routerAPI.post('/stories', postCreateStory);
+routerAPI.get('/stories', getAllStories);
+routerAPI.delete('/stories', deleteStoryAPI);
+
+routerAPI.get('/posts/:postId/comments', getCommentsByPost);
+routerAPI.get('/posts/:postId/likes', getLikesByPost);
+routerAPI.get('/users/:id/followers', getFollowers);
+routerAPI.get('/users/:id/following', getFollowing);
+routerAPI.get('/users/:id/stories', getStoriesByUser);
+routerAPI.get('/users/:id/posts', getUserPosts);
 
 module.exports = routerAPI
