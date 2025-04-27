@@ -16,7 +16,9 @@ module.exports = {
 
         const offset = (page - 1) * limit;
         const rs = await Post.find(filter)
-            .populate(population || ['author', 'likes', 'comments'])
+            .populate('author')
+            .populate('likes')
+            .populate('comments')
             .skip(offset)
             .limit(limit)
             .exec();
@@ -40,5 +42,31 @@ module.exports = {
         } catch (error) {
             console.log(error);
         }
+    },
+    likePostService: async (postId, userId) => {
+        const post = await Post.findById(postId);
+        if (!post) {
+            throw new Error('Post not found');
+        }
+
+        if (!post.likes.includes(userId)) {
+            post.likes.push(userId);
+            await post.save();
+        }
+
+        return post;
+    },
+
+    unlikePostService: async (postId, userId) => {
+        const post = await Post.findById(postId);
+        if (!post) {
+            throw new Error('Post not found');
+        }
+
+        post.likes = post.likes.filter(likeId => likeId.toString() !== userId);
+        await post.save();
+
+        return post;
     }
+
 };

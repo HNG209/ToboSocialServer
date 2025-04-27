@@ -9,11 +9,12 @@ const {
     postCreatePost,
     getAllPost,
     postUpdatePost,
-    deletePostAPI
+    deletePostAPI,
+    likePost,
+    unlikePost
 } = require('../controllers/postController');
 const { register, login } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
-const { likePost, unlikePost } = require('../controllers/likeController');
 const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI } = require('../controllers/commentController');
 const { postCreateNotification, getAllNotifications, postUpdateNotification, deleteNotificationAPI } = require('../controllers/notificationController');
 const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
@@ -72,5 +73,8 @@ routerAPI.get('/users/:id/followers', getFollowers);
 routerAPI.get('/users/:id/following', getFollowing);
 routerAPI.get('/users/:id/stories', getStoriesByUser);
 routerAPI.get('/users/:id/posts', getUserPosts);
+
+routerAPI.post('/posts/:id/like', likePost);
+routerAPI.post('/posts/:id/unlike', unlikePost);
 
 module.exports = routerAPI

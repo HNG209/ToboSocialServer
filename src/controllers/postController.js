@@ -2,7 +2,9 @@ const {
     createPost,
     getPost,
     updatePostService,
-    deletePostService
+    deletePostService,
+    unlikePostService,
+    likePostService
 } = require('../services/postService');
 
 module.exports = {
@@ -37,5 +39,35 @@ module.exports = {
             errorCode: 0,
             result: rs
         });
+    },
+
+    likePost: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { userId } = req.body;
+            const rs = await likePostService(id, userId);
+            res.status(200).json({
+                errorCode: 0,
+                message: 'Liked successfully',
+                likes: rs.likes
+            });
+        } catch (error) {
+            res.status(400).json({ errorCode: 1, message: error.message });
+        }
+    },
+
+    unlikePost: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { userId } = req.body;
+            const rs = await unlikePostService(id, userId);
+            res.status(200).json({
+                errorCode: 0,
+                message: 'Unliked successfully',
+                likes: rs.likes
+            });
+        } catch (error) {
+            res.status(400).json({ errorCode: 1, message: error.message });
+        }
     }
 };

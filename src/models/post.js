@@ -9,15 +9,15 @@ const mediaSchema = new Schema({
 });
 
 const postSchema = new Schema({
-    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    author: { type: Schema.Types.ObjectId, ref: 'user', required: true },
     caption: String,
     mediaFiles: [mediaSchema],
-    likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }]
+    likes: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+    comments: [{ type: Schema.Types.ObjectId, ref: 'comment' }]
 }, {
     timestamps: true
 });
 
 postSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
-const Post = mongoose.model('Post', postSchema);
+const Post = mongoose.model('post', postSchema);
 module.exports = Post;

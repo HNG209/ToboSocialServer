@@ -18,8 +18,8 @@ const userSchema = new Schema({
 
     profile: profileSchema,
 
-    followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    followers: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+    following: [{ type: Schema.Types.ObjectId, ref: 'user' }],
 
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     isVerified: { type: Boolean, default: false }
@@ -28,5 +28,5 @@ const userSchema = new Schema({
 });
 
 userSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('user', userSchema);
 module.exports = User;
