@@ -3,7 +3,11 @@ const {
     postCreateUser,
     getAllUser,
     postUpdateUser,
-    deleteUserAPI
+    deleteUserAPI,
+    postLogin,
+    postLogout,
+    postForgotPassword,
+    postRegister
 } = require('../controllers/usercontroller');
 const {
     postCreatePost,
@@ -81,5 +85,11 @@ routerAPI.post('/posts/:id/unlike', unlikePost);
 routerAPI.post('/like-comment', postLikeComment);
 routerAPI.post('/unlike-comment', postUnlikeComment);
 routerAPI.get('/posts/:id', getPostDetailAPI);
+
+routerAPI.post('/users/login', postLogin);
+routerAPI.post('/users/logout', postLogout);
+routerAPI.post('/users/forgot-password', postForgotPassword);
+
+routerAPI.post('/users/register', postRegister);
 
 module.exports = routerAPI
