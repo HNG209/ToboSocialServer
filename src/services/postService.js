@@ -67,6 +67,32 @@ module.exports = {
         await post.save();
 
         return post;
+    },
+
+    getPostDetailService: async (id) => {
+        const post = await Post.findById(id)
+            .populate({
+                path: 'author',
+                select: 'username profile.avatar fullName' // lấy đủ username + avatar + full name
+            })
+            .populate({
+                path: 'likes',
+                select: 'username profile.avatar' // chỉ cần username + avatar khi hiện người like
+            })
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user',
+                    select: 'username profile.avatar'
+                }
+            });
+
+        if (!post) {
+            throw new Error('Post not found');
+        }
+
+        return post;
     }
+
 
 };

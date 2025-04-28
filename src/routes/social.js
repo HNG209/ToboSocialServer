@@ -11,7 +11,8 @@ const {
     postUpdatePost,
     deletePostAPI,
     likePost,
-    unlikePost
+    unlikePost,
+    getPostDetailAPI
 } = require('../controllers/postController');
 const { register, login } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
@@ -79,5 +80,6 @@ routerAPI.post('/posts/:id/unlike', unlikePost);
 
 routerAPI.post('/like-comment', postLikeComment);
 routerAPI.post('/unlike-comment', postUnlikeComment);
+routerAPI.get('/posts/:id', getPostDetailAPI);
 
 module.exports = routerAPI
