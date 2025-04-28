@@ -2,7 +2,9 @@ const {
     createCommentService,
     getCommentService,
     updateCommentService,
-    deleteCommentService
+    deleteCommentService,
+    likeCommentService,
+    unlikeCommentService
 } = require('../services/commentService');
 
 module.exports = {
@@ -24,5 +26,17 @@ module.exports = {
     deleteCommentAPI: async (req, res) => {
         const rs = await deleteCommentService(req.body.id);
         res.status(200).json({ errorCode: 0, result: rs });
-    }
+    },
+    postLikeComment: async (req, res) => {
+        const { commentId, userId } = req.body;
+        const rs = await likeCommentService(commentId, userId);
+        res.status(200).json({ errorCode: 0, result: rs });
+    },
+
+    // API unlike
+    postUnlikeComment: async (req, res) => {
+        const { commentId, userId } = req.body;
+        const rs = await unlikeCommentService(commentId, userId);
+        res.status(200).json({ errorCode: 0, result: rs });
+    },
 };

@@ -14,7 +14,11 @@ module.exports = {
 
         const offset = (page - 1) * limit;
         const rs = await Comment.find(filter)
-            .populate(population || ['user', 'post'])
+            .populate(population || [
+                { path: 'user', select: 'username' },
+                { path: 'post' },
+                { path: 'likes', select: '_id' }, // Populate mảng likes
+            ])
             .skip(offset)
             .limit(limit)
             .exec();
@@ -29,5 +33,23 @@ module.exports = {
     deleteCommentService: async (id) => {
         const rs = await Comment.deleteById(id);
         return rs;
-    }
+    },
+
+    likeCommentService: async (commentId, userId) => {
+        const rs = await Comment.findByIdAndUpdate(
+            commentId,
+            { $addToSet: { likes: userId } },
+            { new: true }
+        ).populate('likes', '_id'); // Populate likes trong response
+        return rs;
+    },
+
+    unlikeCommentService: async (commentId, userId) => {
+        const rs = await Comment.findByIdAndUpdate(
+            commentId,
+            { $pull: { likes: userId } },
+            { new: true }
+        ).populate('likes', '_id'); // Populate likes trong response
+        return rs;
+    },
 };

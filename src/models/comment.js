@@ -5,7 +5,8 @@ const mongoose_delete = require('mongoose-delete');
 const commentSchema = new Schema({
     post: { type: Schema.Types.ObjectId, ref: 'post', required: true },
     user: { type: Schema.Types.ObjectId, ref: 'user', required: true },
-    text: { type: String, required: true }
+    text: { type: String, required: true },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user', default: [] }]
 }, {
     timestamps: true
 });

@@ -15,7 +15,7 @@ const {
 } = require('../controllers/postController');
 const { register, login } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
-const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI } = require('../controllers/commentController');
+const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI, postLikeComment, postUnlikeComment } = require('../controllers/commentController');
 const { postCreateNotification, getAllNotifications, postUpdateNotification, deleteNotificationAPI } = require('../controllers/notificationController');
 const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
 const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
@@ -76,5 +76,8 @@ routerAPI.get('/users/:id/posts', getUserPosts);
 
 routerAPI.post('/posts/:id/like', likePost);
 routerAPI.post('/posts/:id/unlike', unlikePost);
+
+routerAPI.post('/like-comment', postLikeComment);
+routerAPI.post('/unlike-comment', postUnlikeComment);
 
 module.exports = routerAPI
