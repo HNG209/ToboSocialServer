@@ -7,7 +7,10 @@ const {
     postLogin,
     postLogout,
     postForgotPassword,
-    postRegister
+    postRegister,
+    getSearchUser,
+    getUserByUsername,
+    getPostsByUserId
 } = require('../controllers/usercontroller');
 const {
     postCreatePost,
@@ -91,5 +94,10 @@ routerAPI.post('/users/logout', postLogout);
 routerAPI.post('/users/forgot-password', postForgotPassword);
 
 routerAPI.post('/users/register', postRegister);
+
+//search
+routerAPI.get('/search', getSearchUser);
+routerAPI.get('/by-username/:username', getUserByUsername);
+routerAPI.get('/:id/posts', getPostsByUserId);
 
 module.exports = routerAPI

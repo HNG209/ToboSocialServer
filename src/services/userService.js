@@ -1,6 +1,7 @@
 const aqp = require('api-query-params');
 const nodemailer = require('nodemailer');
 const User = require('../models/user');
+const Post = require('../models/post');
 
 // 1. Setup transporter gửi email
 const transporter = nodemailer.createTransport({
@@ -110,6 +111,34 @@ module.exports = {
         });
 
         return newUser;
-    }
+    },
 
+    searchUserService: async (query) => {
+        const regex = new RegExp(query, 'i'); // không phân biệt hoa thường
+
+        const users = await User.find({
+            $or: [
+                { username: regex },
+                { fullName: regex }
+            ]
+        })
+            .limit(10)
+            .select('username fullName profile.avatar'); // chỉ trả thông tin cần thiết
+
+        return users;
+    },
+    getUserPostsByUserId: async (userId, query) => {
+        const page = parseInt(query.page) || 1;
+        const { limit = 10, population } = aqp(query);
+        const offset = (page - 1) * limit;
+
+        const posts = await Post.find({ author: userId })
+            .populate(population || 'author')
+            .sort({ createdAt: -1 })
+            .skip(offset)
+            .limit(limit)
+            .lean();
+
+        return posts;
+    }
 };
