@@ -28,6 +28,7 @@ const { postCreateNotification, getAllNotifications, postUpdateNotification, del
 const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
 const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
+const { createReport } = require('../controllers/reportController');
 
 const routerAPI = express.Router()
 
@@ -99,5 +100,8 @@ routerAPI.post('/users/register', postRegister);
 routerAPI.get('/search', getSearchUser);
 routerAPI.get('/by-username/:username', getUserByUsername);
 routerAPI.get('/:id/posts', getPostsByUserId);
+
+//report
+routerAPI.post('/reports', createReport);
 
 module.exports = routerAPI
