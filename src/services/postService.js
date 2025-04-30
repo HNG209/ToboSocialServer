@@ -1,6 +1,8 @@
 const aqp = require('api-query-params');
 const Post = require('../models/post');
 const User = require('../models/user');
+const { getUserPosts } = require('../controllers/profileController');
+const { getUserPostsService } = require('./profileService');
 
 module.exports = {
     createPost: async (data) => {
@@ -104,7 +106,22 @@ module.exports = {
         }
 
         return post;
+    },
+
+    getUserPostsService: async (userId, queryString) => {
+        const page = queryString.page || 1;
+        const { filter, limit = 10 } = aqp(queryString);
+        delete filter.page;
+
+        const offset = (page - 1) * limit;
+        const rs = await Post.find({ author: userId })
+            .populate('author')
+            .populate('likes')
+            .populate('comments')
+            .skip(offset)
+            .limit(limit)
+            .exec();
+
+        return rs;
     }
-
-
 };

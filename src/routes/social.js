@@ -16,6 +16,7 @@ const {
     deletePostAPI,
     likePost,
     unlikePost,
+    getUserPostsAPI,
     getPostDetailAPI
 } = require('../controllers/postController');
 const { register, login } = require('../controllers/authController');
@@ -82,9 +83,10 @@ routerAPI.get('/users/:id/posts', getUserPosts);
 routerAPI.post('/posts/:id/like', likePost);
 routerAPI.post('/posts/:id/unlike', unlikePost);
 
-routerAPI.post('/like-comment', postLikeComment);
-routerAPI.post('/unlike-comment', postUnlikeComment);
-routerAPI.get('/posts/:id', getPostDetailAPI);
+routerAPI.post('/like-comment', postLikeComment); // thích bình luận
+routerAPI.post('/unlike-comment', postUnlikeComment); // bỏ thích bình luận
+routerAPI.get('/posts/:id', getPostDetailAPI); // lấy chi tiết bài viết
+routerAPI.get('/users/:id/posts', getUserPostsAPI); // lấy bài viết của người dùng
 
 routerAPI.post('/users/login', postLogin);
 routerAPI.post('/users/logout', postLogout);

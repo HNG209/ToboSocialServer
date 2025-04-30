@@ -88,4 +88,13 @@ module.exports = {
             });
         }
     },
+
+    getUserPostsAPI: async (req, res) => {
+        const { id } = req.params; // lấy id từ URL params
+        const rs = await getPost({ filter: { author: id } }); // gọi service đã viết
+        res.status(200).json({
+            errorCode: 0,
+            result: rs
+        });
+    }
 };
