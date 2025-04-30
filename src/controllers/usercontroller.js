@@ -6,7 +6,8 @@ const {
     loginUserService,
     logoutUserService,
     forgotPasswordService,
-    registerUserService
+    registerUserService,
+    getUserById
 } = require("../services/userService");
 
 module.exports = {
@@ -17,6 +18,15 @@ module.exports = {
 
     getAllUser: async (req, res) => {
         const rs = await getUser(req.query);
+        res.status(200).json({ errorCode: 0, result: rs });
+    },
+
+    getUserByIdAPI: async (req, res) => {
+        const id = req.params.id;
+        const rs = await getUserById(id);
+        if (!rs) {
+            return res.status(404).json({ errorCode: 1, message: 'User not found' });
+        }
         res.status(200).json({ errorCode: 0, result: rs });
     },
 

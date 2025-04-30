@@ -1,6 +1,7 @@
 const aqp = require('api-query-params');
 const nodemailer = require('nodemailer');
 const User = require('../models/user');
+const { get } = require('mongoose');
 
 // 1. Setup transporter gửi email
 const transporter = nodemailer.createTransport({
@@ -29,6 +30,11 @@ module.exports = {
             .skip(offset)
             .limit(limit)
             .exec();
+        return rs;
+    },
+
+    getUserById: async (id) => {
+        const rs = await User.findById(id).exec();
         return rs;
     },
 

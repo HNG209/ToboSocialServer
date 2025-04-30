@@ -7,7 +7,8 @@ const {
     postLogin,
     postLogout,
     postForgotPassword,
-    postRegister
+    postRegister,
+    getUserByIdAPI
 } = require('../controllers/usercontroller');
 const {
     postCreatePost,
@@ -91,7 +92,7 @@ routerAPI.get('/users/:id/posts', getUserPostsAPI); // lấy bài viết của n
 routerAPI.post('/users/login', postLogin);
 routerAPI.post('/users/logout', postLogout);
 routerAPI.post('/users/forgot-password', postForgotPassword);
-
+routerAPI.get('/users/:id', getUserByIdAPI); // lấy thông tin người dùng theo id
 routerAPI.post('/users/register', postRegister);
 
 module.exports = routerAPI
