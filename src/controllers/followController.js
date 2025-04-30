@@ -1,24 +1,40 @@
-const {
-    followUserService,
-    unfollowUserService
-} = require('../services/followService');
+const { followUserService, unfollowUserService } = require("../services/followService");
 
-// Theo dõi người dùng
+// userController.js
 const followUser = async (req, res) => {
     const targetId = req.params.id;
     const { userId } = req.body;
 
     const result = await followUserService(userId, targetId);
-    return res.status(result.status).json(result.error ? { error: result.error } : { message: result.message });
+    if (result.error) {
+        return res.status(result.status).json({ error: result.error });
+    }
+    return res.status(result.status).json({
+        errorCode: 0,
+        result: {
+            message: result.result.message,
+            user: result.result.user,
+            targetUser: result.result.targetUser
+        }
+    });
 };
 
-// Bỏ theo dõi người dùng
 const unfollowUser = async (req, res) => {
     const targetId = req.params.id;
     const { userId } = req.body;
 
     const result = await unfollowUserService(userId, targetId);
-    return res.status(result.status).json(result.error ? { error: result.error } : { message: result.message });
+    if (result.error) {
+        return res.status(result.status).json({ error: result.error });
+    }
+    return res.status(result.status).json({
+        errorCode: 0,
+        result: {
+            message: result.result.message,
+            user: result.result.user,
+            targetUser: result.result.targetUser
+        }
+    });
 };
 
-module.exports = { followUser, unfollowUser };
+module.exports = { followUser, unfollowUser }

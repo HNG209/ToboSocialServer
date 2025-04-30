@@ -15,7 +15,19 @@ module.exports = {
         if (!user.followers.includes(userId)) {
             await user.updateOne({ $push: { followers: userId } });
             await currentUser.updateOne({ $push: { following: targetId } });
-            return { status: 200, message: "Theo dõi thành công!" };
+
+            const updatedCurrentUser = await User.findById(userId);
+            const updatedTargetUser = await User.findById(targetId);
+
+            return {
+                status: 200,
+                errorCode: 0,
+                result: {
+                    message: "Theo dõi thành công!",
+                    user: updatedCurrentUser,
+                    targetUser: updatedTargetUser
+                }
+            };
         } else {
             return { status: 400, error: "Đã theo dõi người này rồi." };
         }
@@ -35,7 +47,19 @@ module.exports = {
         if (user.followers.includes(userId)) {
             await user.updateOne({ $pull: { followers: userId } });
             await currentUser.updateOne({ $pull: { following: targetId } });
-            return { status: 200, message: "Bỏ theo dõi thành công!" };
+
+            const updatedCurrentUser = await User.findById(userId);
+            const updatedTargetUser = await User.findById(targetId);
+
+            return {
+                status: 200,
+                errorCode: 0,
+                result: {
+                    message: "Bỏ theo dõi thành công!",
+                    user: updatedCurrentUser,
+                    targetUser: updatedTargetUser
+                }
+            };
         } else {
             return { status: 400, error: "Bạn chưa theo dõi người này." };
         }
