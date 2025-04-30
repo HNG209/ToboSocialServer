@@ -22,7 +22,9 @@ const userSchema = new Schema({
     following: [{ type: Schema.Types.ObjectId, ref: 'user' }],
 
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
-    isVerified: { type: Boolean, default: false }
+    isVerified: { type: Boolean, default: false },
+
+    postCount: { type: Number, default: 0 }
 }, {
     timestamps: true
 });

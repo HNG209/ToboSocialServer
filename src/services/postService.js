@@ -1,14 +1,18 @@
 const aqp = require('api-query-params');
 const Post = require('../models/post');
+const User = require('../models/user');
 
 module.exports = {
     createPost: async (data) => {
         if (data.type === "EMPTY-POST") {
             const rs = await Post.create(data);
+
+            // Tăng postCount
+            await User.findByIdAndUpdate(data.author, { $inc: { postCount: 1 } });
+
             return rs;
         }
     },
-
     getPost: async (queryString) => {
         const page = queryString.page || 1;
         const { filter, limit = 10, population } = aqp(queryString);
@@ -37,7 +41,15 @@ module.exports = {
 
     deletePostService: async (id) => {
         try {
+            const post = await Post.findById(id);
+
+            if (!post) throw new Error("Post not found");
+
             const rs = await Post.deleteById(id);
+
+            // Giảm postCount
+            await User.findByIdAndUpdate(post.author, { $inc: { postCount: -1 } });
+
             return rs;
         } catch (error) {
             console.log(error);
