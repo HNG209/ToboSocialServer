@@ -29,6 +29,7 @@ const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controlle
 const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
 const { createReport } = require('../controllers/reportController');
+const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone } = require('../controllers/adminController');
 
 const routerAPI = express.Router()
 
@@ -99,9 +100,26 @@ routerAPI.post('/users/register', postRegister);
 //search
 routerAPI.get('/search', getSearchUser);
 routerAPI.get('/by-username/:username', getUserByUsername);
-routerAPI.get('/:id/posts', getPostsByUserId);
 
 //report
 routerAPI.post('/reports', createReport);
+
+// DASHBOARD + ADMIN
+routerAPI.get('/admin/dashboard', getDashboard);
+routerAPI.get('/admin/users', getUsers);
+routerAPI.patch('/admin/users/:id/ban', banUser);
+routerAPI.delete('/admin/users/:id', deleteUser);
+
+routerAPI.get('/admin/posts', getPosts);
+routerAPI.delete('/admin/posts/:id', removePost);
+
+routerAPI.get('/admin/comments', getAllComment);
+routerAPI.delete('/admin/comments/:id', removeComment);
+
+routerAPI.get('/admin/reports', getAllReports);
+routerAPI.patch('/admin/reports/:id/reviewed', markReportDone);
+
+routerAPI.get('/:id/posts', getPostsByUserId);
+
 
 module.exports = routerAPI
