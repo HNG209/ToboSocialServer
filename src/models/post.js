@@ -18,6 +18,8 @@ const postSchema = new Schema({
     timestamps: true
 });
 
-postSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
+// Thêm plugin soft delete (có trường deletedAt + ghi đè find/findOne/etc.)
+postSchema.plugin(mongoose_delete, { deletedAt: true, overrideMethods: 'all' });
+
 const Post = mongoose.model('post', postSchema);
 module.exports = Post;

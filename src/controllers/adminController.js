@@ -110,9 +110,21 @@ const removePost = async (req, res) => {
     try {
         console.log('removePost params:', req.params);
         await adminService.deletePost(req.params.id);
-        res.status(200).json({ errorCode: 0, message: 'Đã xóa bài viết' });
+        res.status(200).json({ errorCode: 0, message: 'Đã xóa bài viết và xử lý các báo cáo liên quan' });
     } catch (err) {
         console.error('Error in removePost:', err);
+        res.status(500).json({ errorCode: 1, message: err.message });
+    }
+};
+
+const restorePost = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        console.log('Received restore request for post ID:', postId, 'Type:', typeof postId);
+        const result = await adminService.restorePost(postId);
+        res.status(200).json({ errorCode: 0, message: result.message });
+    } catch (err) {
+        console.error('Error in restorePost:', err.message, err.stack);
         res.status(500).json({ errorCode: 1, message: err.message });
     }
 };
@@ -174,6 +186,7 @@ module.exports = {
     deleteMultipleUsers,
     getPosts,
     removePost,
+    restorePost,
     getAllComment,
     removeComment,
     getAllReports,

@@ -29,7 +29,7 @@ const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controlle
 const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
 const { createReport } = require('../controllers/reportController');
-const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser } = require('../controllers/adminController');
+const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost } = require('../controllers/adminController');
 
 const routerAPI = express.Router()
 
@@ -116,6 +116,7 @@ routerAPI.delete('/admin/users/delete-multiple', deleteMultipleUsers);
 
 routerAPI.get('/admin/posts', getPosts);
 routerAPI.delete('/admin/posts/:id', removePost);
+routerAPI.patch('/admin/posts/:id/restore', restorePost);
 
 routerAPI.get('/admin/comments', getAllComment);
 routerAPI.delete('/admin/comments/:id', removeComment);
