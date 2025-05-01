@@ -3,7 +3,8 @@ const adminService = require('../services/adminService');
 // === DASHBOARD ===
 const getDashboard = async (req, res) => {
     try {
-        const stats = await adminService.getDashboardStats();
+        const timeFilter = req.query.timeFilter || 'all'; // Mặc định là 'all'
+        const stats = await adminService.getDashboardStats(timeFilter);
         res.status(200).json({ errorCode: 0, result: stats });
     } catch (err) {
         res.status(500).json({ errorCode: 1, message: err.message });

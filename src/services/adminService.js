@@ -5,13 +5,45 @@ const Report = require('../models/report');
 const aqp = require('api-query-params');
 
 // === DASHBOARD ===
-const getDashboardStats = async () => {
+const getDashboardStats = async (timeFilter = 'all') => {
+    const now = new Date();
+    let dateFilter = {};
+
+    // Xử lý bộ lọc thời gian
+    if (timeFilter === '7days') {
+        dateFilter = { $gte: new Date(now - 7 * 24 * 60 * 60 * 1000) };
+    } else if (timeFilter === 'month') {
+        dateFilter = { $gte: new Date(now.getFullYear(), now.getMonth(), 1) };
+    } else if (timeFilter === 'quarter') {
+        dateFilter = { $gte: new Date(now - 90 * 24 * 60 * 60 * 1000) };
+    }
+
+    // Tổng số liệu hiện tại
     const userCount = await User.countDocuments();
     const postCount = await Post.countDocuments();
     const commentCount = await Comment.countDocuments();
     const pendingReports = await Report.countDocuments({ status: 'pending' });
 
+    // Tính biến động (so với tháng trước)
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+    const lastMonthStats = {
+        userCount: await User.countDocuments({ createdAt: { $lte: lastMonthEnd } }),
+        postCount: await Post.countDocuments({ createdAt: { $lte: lastMonthEnd } }),
+        commentCount: await Comment.countDocuments({ createdAt: { $lte: lastMonthEnd } }),
+        pendingReports: await Report.countDocuments({ status: 'pending', createdAt: { $lte: lastMonthEnd } }),
+    };
+
+    const variations = {
+        userVariation: userCount > 0 ? ((userCount - lastMonthStats.userCount) / lastMonthStats.userCount * 100).toFixed(1) : 0,
+        postVariation: postCount > 0 ? ((postCount - lastMonthStats.postCount) / lastMonthStats.postCount * 100).toFixed(1) : 0,
+        commentVariation: commentCount > 0 ? ((commentCount - lastMonthStats.commentCount) / lastMonthStats.commentCount * 100).toFixed(1) : 0,
+        reportVariation: pendingReports - lastMonthStats.pendingReports, // Số tuyệt đối cho báo cáo
+    };
+
+    // Biểu đồ bài viết theo thời gian
     const postStats = await Post.aggregate([
+        { $match: dateFilter.createdAt ? { createdAt: dateFilter } : {} },
         {
             $group: {
                 _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
@@ -21,6 +53,7 @@ const getDashboardStats = async () => {
         { $sort: { _id: 1 } }
     ]);
 
+    // Danh sách bài viết bị báo cáo nhiều nhất
     const mostReportedPosts = await Report.aggregate([
         { $group: { _id: "$post", totalReports: { $sum: 1 } } },
         { $sort: { totalReports: -1 } },
@@ -33,10 +66,27 @@ const getDashboardStats = async () => {
                 as: 'post'
             }
         },
-        { $unwind: "$post" }
+        { $unwind: "$post" },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'post.author',
+                foreignField: '_id',
+                as: 'post.author'
+            }
+        },
+        { $unwind: "$post.author" }
     ]);
 
-    return { userCount, postCount, commentCount, pendingReports, postStats, mostReportedPosts };
+    return {
+        userCount,
+        postCount,
+        commentCount,
+        pendingReports,
+        variations,
+        postStats,
+        mostReportedPosts
+    };
 };
 
 // === USER MANAGEMENT ===
