@@ -39,7 +39,8 @@ module.exports = {
     },
 
     updateUserService: async (data) => {
-        const rs = await User.updateOne({ _id: data.id }, { ...data });
+        console.log('data', data);
+        const rs = await User.updateOne({ _id: data._id }, { ...data });
         return rs;
     },
 
