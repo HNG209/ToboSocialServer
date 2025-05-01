@@ -29,7 +29,7 @@ const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controlle
 const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
 const { createReport } = require('../controllers/reportController');
-const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone } = require('../controllers/adminController');
+const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser } = require('../controllers/adminController');
 
 const routerAPI = express.Router()
 
@@ -107,8 +107,12 @@ routerAPI.post('/reports', createReport);
 // DASHBOARD + ADMIN
 routerAPI.get('/admin/dashboard', getDashboard);
 routerAPI.get('/admin/users', getUsers);
-routerAPI.patch('/admin/users/:id/ban', banUser);
+routerAPI.get('/admin/users/export', exportUsers);
+routerAPI.post('/ban/:id', banUser);
+routerAPI.post('/unban/:id', unbanUser);
 routerAPI.delete('/admin/users/:id', deleteUser);
+routerAPI.patch('/admin/users/ban-multiple', banMultipleUsers);
+routerAPI.delete('/admin/users/delete-multiple', deleteMultipleUsers);
 
 routerAPI.get('/admin/posts', getPosts);
 routerAPI.delete('/admin/posts/:id', removePost);
