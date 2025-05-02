@@ -3,6 +3,7 @@ const Post = require('../models/post');
 const Comment = require('../models/comment');
 const Report = require('../models/report');
 const mongoose = require('mongoose');
+const Notification = require('../models/notification');
 
 // === DASHBOARD ===
 const getDashboardStats = async (timeFilter = 'all') => {
@@ -342,24 +343,135 @@ const deleteComment = async (commentId) => {
 const getReports = async (query) => {
     const limit = parseInt(query.limit) || 10;
     const skip = parseInt(query.skip) || 0;
+    const filter = query.filter || {};
+
+    const status = filter.status || 'all';
+    const reporterUsername = filter.reporter?.username || '';
+    const postCaption = filter.post?.caption || '';
+    const reason = filter.reason || '';
 
     console.log('Raw Query:', query);
-    console.log('Parsed Params:', { limit, skip });
+    console.log('Parsed Params:', { limit, skip, status, reporterUsername, postCaption, reason });
 
-    const reports = await Report.find({})
-        .populate('reporter post')
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 });
+    let actualFilter = {};
 
-    console.log('Reports found:', reports.length);
+    if (status !== 'all') {
+        actualFilter.status = status;
+    }
 
-    return reports;
+    if (reporterUsername) {
+        const users = await User.find({
+            username: new RegExp(reporterUsername, 'i')
+        }).select('_id');
+        if (users.length > 0) {
+            actualFilter.reporter = { $in: users.map(u => u._id) };
+        } else {
+            return { reports: [], total: 0 };
+        }
+    }
+
+    if (postCaption) {
+        const posts = await Post.find({
+            caption: new RegExp(postCaption, 'i')
+        }).select('_id');
+        if (posts.length > 0) {
+            actualFilter.post = { $in: posts.map(p => p._id) };
+        } else {
+            return { reports: [], total: 0 };
+        }
+    }
+
+    if (reason) {
+        actualFilter.reason = new RegExp(reason, 'i');
+    }
+
+    console.log('MongoDB Filter:', actualFilter);
+
+    const [reports, total] = await Promise.all([
+        Report.find(actualFilter)
+            .populate({
+                path: 'reporter',
+                select: 'username profile.avatar'
+            })
+            .populate({
+                path: 'post',
+                select: 'caption mediaFiles author',
+                populate: { path: 'author', select: 'username' }
+            })
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 }),
+        Report.countDocuments(actualFilter)
+    ]);
+
+    console.log('Reports found:', reports.length, 'Total:', total);
+    return { reports, total };
+};
+const getPostReportCount = async (postId) => {
+    const count = await Report.countDocuments({ post: postId });
+    return count;
 };
 
 const markReportReviewed = async (reportId) => {
     console.log('Marking report reviewed:', reportId);
     return Report.updateOne({ _id: reportId }, { status: 'reviewed' });
+};
+
+const createWarningNotification = async (recipientId, message, relatedEntityId = null, relatedEntityModel = null) => {
+    console.log('Creating warning notification for user:', recipientId);
+    const notification = new Notification({
+        recipient: recipientId,
+        sender: null, // Có thể thêm admin ID nếu có hệ thống xác thực admin
+        type: 'warning',
+        title: 'Cảnh báo từ quản trị viên',
+        message,
+        relatedEntity: relatedEntityId,
+        relatedEntityModel,
+    });
+    return notification.save();
+};
+
+const warnUser = async (userId, warningMessage, relatedPostId = null) => {
+    console.log('Warning user:', userId);
+    // Tạo thông báo cảnh báo
+    await createWarningNotification(userId, warningMessage, relatedPostId, 'post');
+    // Có thể thêm logic khác như ghi log hoặc gửi email nếu cần
+};
+
+// Lấy danh sách thông báo của người dùng
+const getUserNotifications = async (userId, query) => {
+    const limit = parseInt(query.limit) || 10;
+    const skip = parseInt(query.skip) || 0;
+
+    console.log('Fetching notifications for user:', userId, 'Params:', { limit, skip });
+
+    const [notifications, total] = await Promise.all([
+        Notification.find({ recipient: userId })
+            .populate({
+                path: 'relatedEntity',
+                select: 'caption mediaFiles',
+                match: { relatedEntityModel: 'post' },
+                populate: { path: 'author', select: 'username' }
+            })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit),
+        Notification.countDocuments({ recipient: userId })
+    ]);
+
+    console.log('Notifications found:', notifications.length, 'Total:', total);
+    return { notifications, total };
+};
+// Đánh dấu một thông báo là đã xem
+const markNotificationAsRead = async (notificationId) => {
+    console.log('Marking notification as read:', notificationId);
+    return Notification.updateOne({ _id: notificationId }, { isRead: true });
+};
+
+// Đánh dấu tất cả thông báo của người dùng là đã xem
+const markAllNotificationsAsRead = async (userId) => {
+    console.log('Marking all notifications as read for user:', userId);
+    return Notification.updateMany({ recipient: userId, isRead: false }, { isRead: true });
 };
 
 module.exports = {
@@ -377,5 +489,10 @@ module.exports = {
     getComments,
     deleteComment,
     getReports,
-    markReportReviewed
+    getPostReportCount,
+    markReportReviewed,
+    warnUser,
+    getUserNotifications,
+    markNotificationAsRead,
+    markAllNotificationsAsRead
 };

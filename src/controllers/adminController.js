@@ -164,6 +164,18 @@ const getAllReports = async (req, res) => {
     }
 };
 
+const getPostReportCount = async (req, res) => {
+    try {
+        const postId = req.params.postId;
+        console.log('getPostReportCount params:', { postId });
+        const count = await adminService.getPostReportCount(postId);
+        res.status(200).json({ errorCode: 0, result: { reportCount: count } });
+    } catch (err) {
+        console.error('Error in getPostReportCount:', err);
+        res.status(500).json({ errorCode: 1, message: err.message });
+    }
+};
+
 const markReportDone = async (req, res) => {
     try {
         console.log('markReportDone params:', req.params);
@@ -171,6 +183,55 @@ const markReportDone = async (req, res) => {
         res.status(200).json({ errorCode: 0, message: 'Đã đánh dấu đã xử lý' });
     } catch (err) {
         console.error('Error in markReportDone:', err);
+        res.status(500).json({ errorCode: 1, message: err.message });
+    }
+};
+
+const warnUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { message, relatedPostId } = req.body;
+        console.log('warnUser params:', { userId, message, relatedPostId });
+        await adminService.warnUser(userId, message, relatedPostId);
+        res.status(200).json({ errorCode: 0, message: 'Đã gửi cảnh báo đến user' });
+    } catch (err) {
+        console.error('Error in warnUser:', err);
+        res.status(500).json({ errorCode: 1, message: err.message });
+    }
+};
+
+const getUserNotifications = async (req, res) => {
+    try {
+        const userId = req.user._id; // Giả định userId lấy từ middleware xác thực
+        console.log('getUserNotifications query:', req.query);
+        const response = await adminService.getUserNotifications(userId, req.query);
+        res.status(200).json({ errorCode: 0, result: response });
+    } catch (err) {
+        console.error('Error in getUserNotifications:', err);
+        res.status(500).json({ errorCode: 1, message: err.message });
+    }
+};
+
+const markNotificationAsRead = async (req, res) => {
+    try {
+        const { notificationId } = req.params;
+        console.log('markNotificationAsRead params:', { notificationId });
+        await adminService.markNotificationAsRead(notificationId);
+        res.status(200).json({ errorCode: 0, message: 'Đã đánh dấu thông báo là đã xem' });
+    } catch (err) {
+        console.error('Error in markNotificationAsRead:', err);
+        res.status(500).json({ errorCode: 1, message: err.message });
+    }
+};
+
+const markAllNotificationsAsRead = async (req, res) => {
+    try {
+        const userId = req.user._id; // Giả định userId lấy từ middleware xác thực
+        console.log('markAllNotificationsAsRead for user:', userId);
+        await adminService.markAllNotificationsAsRead(userId);
+        res.status(200).json({ errorCode: 0, message: 'Đã đánh dấu tất cả thông báo là đã xem' });
+    } catch (err) {
+        console.error('Error in markAllNotificationsAsRead:', err);
         res.status(500).json({ errorCode: 1, message: err.message });
     }
 };
@@ -190,5 +251,10 @@ module.exports = {
     getAllComment,
     removeComment,
     getAllReports,
-    markReportDone
+    getPostReportCount,
+    markReportDone,
+    warnUser,
+    getUserNotifications,
+    markNotificationAsRead,
+    markAllNotificationsAsRead
 };

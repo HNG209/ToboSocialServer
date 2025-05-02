@@ -1,17 +1,28 @@
+// notification.js
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const mongoose_delete = require('mongoose-delete');
 
 const notificationSchema = new Schema({
-    recipient: { type: Schema.Types.ObjectId, ref: 'User' },
-    sender: { type: Schema.Types.ObjectId, ref: 'User' },
-    type: { type: String, enum: ['like', 'comment', 'follow'], required: true },
-    post: { type: Schema.Types.ObjectId, ref: 'Post' },
-    isRead: { type: Boolean, default: false }
+    recipient: { type: Schema.Types.ObjectId, ref: 'user', required: true },
+    sender: { type: Schema.Types.ObjectId, ref: 'user' },
+    type: { type: String, enum: ['warning', 'info', 'post', 'comment'], required: true },
+    title: { type: String, required: true },
+    message: { type: String, required: true },
+    relatedEntity: {
+        type: Schema.Types.ObjectId,
+        refPath: 'relatedEntityModel'
+    },
+    relatedEntityModel: {
+        type: String,
+        enum: ['post', 'comment', 'report', null]
+    },
+    isRead: { type: Boolean, default: false },
 }, {
     timestamps: true
 });
 
-notificationSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
-const Notification = mongoose.model('Notification', notificationSchema);
+notificationSchema.set('strictPopulate', false);
+
+
+const Notification = mongoose.model('notification', notificationSchema);
 module.exports = Notification;

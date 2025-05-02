@@ -29,7 +29,7 @@ const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controlle
 const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
 const { createReport } = require('../controllers/reportController');
-const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost } = require('../controllers/adminController');
+const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser, getUserNotifications, markNotificationAsRead, markAllNotificationsAsRead } = require('../controllers/adminController');
 
 const routerAPI = express.Router()
 
@@ -122,7 +122,13 @@ routerAPI.get('/admin/comments', getAllComment);
 routerAPI.delete('/admin/comments/:id', removeComment);
 
 routerAPI.get('/admin/reports', getAllReports);
+routerAPI.get('/admin/reports/post/:id/count', getPostReportCount);
 routerAPI.patch('/admin/reports/:id/reviewed', markReportDone);
+routerAPI.post('/users/:userId/warn', warnUser);
+
+routerAPI.get('/notifications', getUserNotifications);
+routerAPI.patch('/notifications/:notificationId/read', markNotificationAsRead);
+routerAPI.patch('/notifications/read-all', markAllNotificationsAsRead);
 
 routerAPI.get('/:id/posts', getPostsByUserId);
 
