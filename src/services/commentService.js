@@ -2,11 +2,15 @@ const Comment = require('../models/comment');
 const aqp = require('api-query-params');
 
 module.exports = {
+    //Hung sua lai
     createCommentService: async (data) => {
-        const rs = await Comment.create(data);
-        return rs;
+        const newComment = await new Comment(data).save();
+        return await newComment.populate({
+            path: 'user',
+            select: 'username profile.avatar'
+        });
     },
-
+    
     getCommentService: async (queryString) => {
         const page = queryString.page || 1;
         const { filter, limit = 10, population } = aqp(queryString);

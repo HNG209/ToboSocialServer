@@ -7,15 +7,17 @@ const Story = require('../models/story');
 module.exports = {
     getCommentsByPostService: async (postId, query) => {
         const page = parseInt(query.page) || 1;
-        const { limit = 10, population } = aqp(query);
+        const { limit = 10 } = aqp(query); // loại bỏ population nếu không cần linh hoạt
         const offset = (page - 1) * limit;
 
         const comments = await Comment.find({ post: postId })
-            .populate(population || 'user')
+            .populate({
+                path: 'user',
+                select: 'username profile.avatar' // chỉ lấy hai trường cụ thể
+            })
             .skip(offset)
             .limit(limit)
             .sort({ createdAt: -1 });
-
         return comments;
     },
 
