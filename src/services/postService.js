@@ -15,6 +15,26 @@ module.exports = {
             return rs;
         }
     },
+
+    getAuthorByPostIdService: async (postId) => {
+        try {
+            // Tìm bài viết theo ID và populate trường author
+            const post = await Post.findById(postId).populate({
+                path: 'author',
+                select: 'username email fullName profile.avatar' // chọn các trường cần thiết
+            });
+    
+            if (!post) {
+                throw new Error('Post not found');
+            }
+    
+            return post.author;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
+
     getPost: async (queryString) => {
         const page = queryString.page || 1;
         const { filter, limit = 10, population } = aqp(queryString);
@@ -30,6 +50,34 @@ module.exports = {
             .exec();
 
         return rs;
+    },
+
+    //Hung them vo
+    getPostWithLikeChecked: async (queryString, userId) => {
+        const page = queryString.page || 1;
+        const { filter, limit = 10, population } = aqp(queryString);
+        delete filter.page;
+    
+        const offset = (page - 1) * limit;
+        const posts = await Post.find(filter)
+            .populate('author')
+            .populate('likes')       // vẫn cần nếu muốn hiển thị danh sách người like
+            .populate('comments')
+            .skip(offset)
+            .limit(limit)
+            .lean(); // để có thể thêm trường mới
+    
+        // Lấy danh sách các postId mà user đã like
+        const likedPostIds = await Like.find({ user: userId, post: { $in: posts.map(p => p._id) } })
+            .distinct('post');
+    
+        // Gắn isLiked vào từng bài viết
+        const postsWithLikeStatus = posts.map(post => ({
+            ...post,
+            isLiked: likedPostIds.includes(post._id.toString())
+        }));
+    
+        return postsWithLikeStatus;
     },
 
     updatePostService: async (data) => {

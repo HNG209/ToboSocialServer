@@ -18,7 +18,8 @@ const {
     likePost,
     unlikePost,
     getUserPostsAPI,
-    getPostDetailAPI
+    getPostDetailAPI,
+    getPostAuthor
 } = require('../controllers/postController');
 const { register, login } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
@@ -27,6 +28,7 @@ const { postCreateNotification, getAllNotifications, postUpdateNotification, del
 const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
 const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
+const likeControllerV2 = require('../controllers/likeControllerV2');
 
 const routerAPI = express.Router()
 
@@ -94,5 +96,12 @@ routerAPI.post('/users/logout', postLogout);
 routerAPI.post('/users/forgot-password', postForgotPassword);
 routerAPI.get('/users/:id', getUserByIdAPI); // lấy thông tin người dùng theo id
 routerAPI.post('/users/register', postRegister);
+
+routerAPI.post('/like/:postId', likeControllerV2.likePost);
+routerAPI.post('/unlike/:postId', likeControllerV2.unlikePost);
+routerAPI.post('/:postId/status', likeControllerV2.isPostLiked);
+routerAPI.get('/:postId/count', likeControllerV2.countPostLikes);
+routerAPI.get('/:postId/users', likeControllerV2.getPostLikers);
+routerAPI.get('/:postId/author', getPostAuthor);
 
 module.exports = routerAPI

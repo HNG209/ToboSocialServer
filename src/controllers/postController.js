@@ -5,7 +5,8 @@ const {
     deletePostService,
     unlikePostService,
     likePostService,
-    getPostDetailService
+    getPostDetailService,
+    getAuthorByPostIdService
 } = require('../services/postService');
 
 module.exports = {
@@ -92,6 +93,17 @@ module.exports = {
     getUserPostsAPI: async (req, res) => {
         const { id } = req.params; // lấy id từ URL params
         const rs = await getPost({ filter: { author: id } }); // gọi service đã viết
+        res.status(200).json({
+            errorCode: 0,
+            result: rs
+        });
+    },
+
+    getPostAuthor: async (req, res) => {
+        const { postId } = req.params;
+        console.log(postId)
+        const rs = await getAuthorByPostIdService(postId)
+
         res.status(200).json({
             errorCode: 0,
             result: rs
