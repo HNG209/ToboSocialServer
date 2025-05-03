@@ -24,12 +24,12 @@ const {
 const { register, login } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
 const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI, postLikeComment, postUnlikeComment } = require('../controllers/commentController');
-const { postCreateNotification, getAllNotifications, postUpdateNotification, deleteNotificationAPI } = require('../controllers/notificationController');
+const { postCreateNotification, postUpdateNotification, deleteNotificationAPI, markNotificationAsRead, markAllNotificationsAsRead, getAllNotifications } = require('../controllers/notificationController');
 const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
 const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
 const { createReport } = require('../controllers/reportController');
-const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser, getUserNotifications, markNotificationAsRead, markAllNotificationsAsRead } = require('../controllers/adminController');
+const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser } = require('../controllers/adminController');
 const { getCurrentUser, updateUserProfile, updateUserPassword } = require('../controllers/adminUserController');
 
 const routerAPI = express.Router()
@@ -127,8 +127,8 @@ routerAPI.get('/admin/reports/post/:id/count', getPostReportCount);
 routerAPI.patch('/admin/reports/:id/reviewed', markReportDone);
 routerAPI.post('/users/:userId/warn', warnUser);
 
-routerAPI.get('/notifications', getUserNotifications);
-routerAPI.patch('/notifications/:notificationId/read', markNotificationAsRead);
+routerAPI.get('/notifications', getAllNotifications);
+routerAPI.patch('/notifications/:id/read', markNotificationAsRead);
 routerAPI.patch('/notifications/read-all', markAllNotificationsAsRead);
 
 routerAPI.get('/admin/account', getCurrentUser);
