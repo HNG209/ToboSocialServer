@@ -30,6 +30,7 @@ const { getCommentsByPost, getLikesByPost, getFollowers, getFollowing, getStorie
 const { getUserPosts } = require('../controllers/profileController');
 const { createReport } = require('../controllers/reportController');
 const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser, getUserNotifications, markNotificationAsRead, markAllNotificationsAsRead } = require('../controllers/adminController');
+const { getCurrentUser, updateUserProfile, updateUserPassword } = require('../controllers/adminUserController');
 
 const routerAPI = express.Router()
 
@@ -129,6 +130,10 @@ routerAPI.post('/users/:userId/warn', warnUser);
 routerAPI.get('/notifications', getUserNotifications);
 routerAPI.patch('/notifications/:notificationId/read', markNotificationAsRead);
 routerAPI.patch('/notifications/read-all', markAllNotificationsAsRead);
+
+routerAPI.get('/admin/account', getCurrentUser);
+routerAPI.put('/admin/account/profile', updateUserProfile);
+routerAPI.put('/admin/account/password', updateUserPassword);
 
 routerAPI.get('/:id/posts', getPostsByUserId);
 
