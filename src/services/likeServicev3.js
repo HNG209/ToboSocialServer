@@ -26,7 +26,7 @@ module.exports = {
 
         await Like.create({ user: userId, target: targetId, onModel });
 
-        return { status: 200, isLiked: true, message: 'Like thành công!' };
+        return { targetId, onModel, status: 200, isLiked: true, message: 'Like thành công!' };
     },
 
     unlikeService: async (userId, targetId, onModel) => {
@@ -41,7 +41,7 @@ module.exports = {
 
         await Like.deleteOne({ _id: like._id });
 
-        return { status: 200, isLiked: false, message: 'Unlike thành công!' };
+        return { targetId, onModel, status: 200, isLiked: false, message: 'Unlike thành công!' };
     },
 
     isLikedService: async (userId, targetId, onModel) => {

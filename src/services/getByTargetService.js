@@ -3,6 +3,7 @@ const Comment = require('../models/comment');
 const Post = require('../models/post');
 const User = require('../models/user');
 const Story = require('../models/story');
+const Like = require('../models/likev2');
 
 module.exports = {
     getCommentsByPostService: async (postId, query) => {
@@ -18,6 +19,39 @@ module.exports = {
             .skip(offset)
             .limit(limit)
             .sort({ createdAt: -1 });
+        return comments;
+    },
+
+    getCommentsByPostServicev2: async (postId, userId, query) => { // trả về comment và trạng thái đã like đối với người dùng hiện tại
+        const page = parseInt(query.page) || 1;
+        const { limit = 10 } = aqp(query);
+        const offset = (page - 1) * limit;
+
+        const comments = await Comment.find({ post: postId })
+            .populate({
+                path: 'user',
+                select: 'username profile.avatar'
+            })
+            .skip(offset)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+        if (userId) {
+            const commentIds = comments.map(c => c._id);
+            const likedComments = await Like.find({
+                user: userId,
+                target: { $in: commentIds },
+                onModel: 'comment'
+            }).select('target');
+
+            const likedSet = new Set(likedComments.map(like => like.target.toString()));
+
+            // Gắn thêm trường isLiked vào từng comment
+            comments.forEach(comment => {
+                comment._doc.isLiked = likedSet.has(comment._id.toString());
+            });
+        }
+
         return comments;
     },
 

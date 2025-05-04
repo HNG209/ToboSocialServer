@@ -3,12 +3,21 @@ const {
     getLikesByPostService,
     getFollowersService,
     getFollowingService,
-    getStoriesByUserService
+    getStoriesByUserService,
+    getCommentsByPostServicev2
 } = require('../services/getByTargetService');
 
 module.exports = {
     getCommentsByPost: async (req, res) => {
         const comments = await getCommentsByPostService(req.params.postId, req.query);
+        res.status(200).json({ errorCode: 0, result: comments });
+    },
+
+    getCommentsByPostv2: async (req, res) => {
+        const { userId } = req.body;
+        const { postId } = req.params;
+
+        const comments = await getCommentsByPostServicev2(postId, userId, req.query);
         res.status(200).json({ errorCode: 0, result: comments });
     },
 
