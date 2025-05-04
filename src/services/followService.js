@@ -63,5 +63,6 @@ module.exports = {
         } else {
             return { status: 400, error: "Bạn chưa theo dõi người này." };
         }
-    }
+    },
+
 };

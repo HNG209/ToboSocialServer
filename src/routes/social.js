@@ -8,7 +8,10 @@ const {
     postLogout,
     postForgotPassword,
     postRegister,
-    getUserByIdAPI
+    getUserByIdAPI,
+    getSearchUser,
+    getUserByUsername,
+    getPostsByUserId
 } = require('../controllers/usercontroller');
 const {
     postCreatePost,
@@ -24,11 +27,14 @@ const {
 const { register, login } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
 const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI, postLikeComment, postUnlikeComment } = require('../controllers/commentController');
-const { postCreateNotification, getAllNotifications, postUpdateNotification, deleteNotificationAPI } = require('../controllers/notificationController');
+const { postCreateNotification, postUpdateNotification, deleteNotificationAPI, markNotificationAsRead, markAllNotificationsAsRead, getAllNotifications } = require('../controllers/notificationController');
 const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
 const { getCommentsByPost, getCommentsByPostv2, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
 const likeControllerv3 = require('../controllers/likeControllerv3');
+const { createReport } = require('../controllers/reportController');
+const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser } = require('../controllers/adminController');
+const { getCurrentUser, updateUserProfile, updateUserPassword } = require('../controllers/adminUserController');
 
 const routerAPI = express.Router()
 
@@ -112,5 +118,44 @@ routerAPI.post('/like/count/:targetId', likeControllerv3.countLikes);
 routerAPI.post('/likers/:targetId', likeControllerv3.getLikers);
 
 routerAPI.get('/:postId/author', getPostAuthor);
+//search
+routerAPI.get('/search', getSearchUser);
+routerAPI.get('/by-username/:username', getUserByUsername);
+
+//report
+routerAPI.post('/reports', createReport);
+
+// DASHBOARD + ADMIN
+routerAPI.get('/admin/dashboard', getDashboard);
+routerAPI.get('/admin/users', getUsers);
+routerAPI.get('/admin/users/export', exportUsers);
+routerAPI.post('/ban/:id', banUser);
+routerAPI.post('/unban/:id', unbanUser);
+routerAPI.delete('/admin/users/:id', deleteUser);
+routerAPI.patch('/admin/users/ban-multiple', banMultipleUsers);
+routerAPI.delete('/admin/users/delete-multiple', deleteMultipleUsers);
+
+routerAPI.get('/admin/posts', getPosts);
+routerAPI.delete('/admin/posts/:id', removePost);
+routerAPI.patch('/admin/posts/:id/restore', restorePost);
+
+routerAPI.get('/admin/comments', getAllComment);
+routerAPI.delete('/admin/comments/:id', removeComment);
+
+routerAPI.get('/admin/reports', getAllReports);
+routerAPI.get('/admin/reports/post/:id/count', getPostReportCount);
+routerAPI.patch('/admin/reports/:id/reviewed', markReportDone);
+routerAPI.post('/users/:userId/warn', warnUser);
+
+routerAPI.get('/notifications', getAllNotifications);
+routerAPI.patch('/notifications/:id/read', markNotificationAsRead);
+routerAPI.patch('/notifications/read-all', markAllNotificationsAsRead);
+
+routerAPI.get('/admin/account', getCurrentUser);
+routerAPI.put('/admin/account/profile', updateUserProfile);
+routerAPI.put('/admin/account/password', updateUserPassword);
+
+routerAPI.get('/:id/posts', getPostsByUserId);
+
 
 module.exports = routerAPI

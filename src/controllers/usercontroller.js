@@ -1,3 +1,4 @@
+const User = require("../models/user");
 const {
     createUser,
     getUser,
@@ -7,7 +8,9 @@ const {
     logoutUserService,
     forgotPasswordService,
     registerUserService,
-    getUserById
+    getUserById,
+    searchUserService,
+    getUserPostsByUserId
 } = require("../services/userService");
 
 module.exports = {
@@ -74,6 +77,42 @@ module.exports = {
             res.status(200).json({ errorCode: 0, result: newUser });
         } catch (error) {
             res.status(400).json({ errorCode: 1, message: error.message });
+        }
+    },
+
+    getSearchUser: async (req, res) => {
+        try {
+            const query = req.query.q;
+            if (!query) return res.status(400).json({ errorCode: 1, message: 'Thiếu từ khóa tìm kiếm' });
+
+            const users = await searchUserService(query);
+            res.status(200).json({ errorCode: 0, result: users });
+        } catch (error) {
+            res.status(500).json({ errorCode: 1, message: error.message });
+        }
+    },
+
+    getUserByUsername: async (req, res) => {
+        const username = req.params.username;
+        const user = await User.findOne({ username }).select("-password");
+        if (!user) return res.status(404).json({ errorCode: 1, message: "Không tìm thấy người dùng" });
+
+        res.status(200).json({ errorCode: 0, result: user });
+    },
+    getPostsByUserId: async (req, res) => {
+        try {
+            const userId = req.params.id;
+            const posts = await getUserPostsByUserId(userId, req.query);
+
+            res.status(200).json({
+                errorCode: 0,
+                result: posts
+            });
+        } catch (error) {
+            res.status(400).json({
+                errorCode: 1,
+                message: error.message
+            });
         }
     }
 };
