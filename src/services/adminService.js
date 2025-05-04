@@ -74,6 +74,12 @@ const getDashboardStats = async (timeFilter = 'all') => {
         { $unwind: "$post.author" }
     ]);
 
+    // Thêm topActiveUsers
+    const topActiveUsers = await User.find()
+        .sort({ postCount: -1 })
+        .limit(5)
+        .select('username postCount');
+
     return {
         userCount,
         postCount,
@@ -81,7 +87,8 @@ const getDashboardStats = async (timeFilter = 'all') => {
         pendingReports,
         variations,
         postStats,
-        mostReportedPosts
+        mostReportedPosts,
+        topActiveUsers
     };
 };
 
