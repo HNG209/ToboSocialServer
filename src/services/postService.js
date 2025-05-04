@@ -3,6 +3,7 @@ const Post = require('../models/post');
 const User = require('../models/user');
 const { getUserPosts } = require('../controllers/profileController');
 const { getUserPostsService } = require('./profileService');
+const likeServicev3 = require('./likeServicev3');
 
 module.exports = {
     createPost: async (data) => {
@@ -23,11 +24,11 @@ module.exports = {
                 path: 'author',
                 select: 'username email fullName profile.avatar' // chọn các trường cần thiết
             });
-    
+
             if (!post) {
                 throw new Error('Post not found');
             }
-    
+
             return post.author;
         } catch (error) {
             console.error(error);
@@ -57,7 +58,7 @@ module.exports = {
         const page = queryString.page || 1;
         const { filter, limit = 10, population } = aqp(queryString);
         delete filter.page;
-    
+
         const offset = (page - 1) * limit;
         const posts = await Post.find(filter)
             .populate('author')
@@ -66,17 +67,17 @@ module.exports = {
             .skip(offset)
             .limit(limit)
             .lean(); // để có thể thêm trường mới
-    
+
         // Lấy danh sách các postId mà user đã like
         const likedPostIds = await Like.find({ user: userId, post: { $in: posts.map(p => p._id) } })
             .distinct('post');
-    
+
         // Gắn isLiked vào từng bài viết
         const postsWithLikeStatus = posts.map(post => ({
             ...post,
             isLiked: likedPostIds.includes(post._id.toString())
         }));
-    
+
         return postsWithLikeStatus;
     },
 
@@ -137,21 +138,13 @@ module.exports = {
                 path: 'author',
                 select: 'username profile.avatar fullName' // lấy đủ username + avatar + full name
             })
-            .populate({
-                path: 'likes',
-                select: 'username profile.avatar' // chỉ cần username + avatar khi hiện người like
-            })
-            .populate({
-                path: 'comments',
-                populate: {
-                    path: 'user',
-                    select: 'username profile.avatar'
-                }
-            });
+            .lean()
 
         if (!post) {
             throw new Error('Post not found');
         }
+
+        post.likeCount = (await likeServicev3.countLikesService(id, 'post')).likes
 
         return post;
     },
