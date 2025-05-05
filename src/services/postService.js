@@ -144,7 +144,7 @@ module.exports = {
             throw new Error('Post not found');
         }
 
-        post.likeCount = (await likeServicev3.countLikesService(id, 'post')).likes
+        // post.likeCount = (await likeServicev3.countLikesService(id, 'post')).likes
 
         return post;
     },

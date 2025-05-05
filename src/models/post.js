@@ -13,6 +13,8 @@ const postSchema = new Schema({
     caption: String,
     mediaFiles: [mediaSchema],
     likes: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+    likeCount: { type: Number, default: 0 },
+    commentCount: { type: Number, default: 0 },
     comments: [{ type: Schema.Types.ObjectId, ref: 'comment' }]
 }, {
     timestamps: true
