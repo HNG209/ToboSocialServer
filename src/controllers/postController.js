@@ -83,8 +83,8 @@ module.exports = {
             const rs = await likePostService(id, userId);
             res.status(200).json({
                 errorCode: 0,
-                message: 'Liked successfully',
-                likes: rs.likes
+                message: 'Thích bài viết thành công',
+                likes: rs.likes,
             });
         } catch (error) {
             res.status(400).json({ errorCode: 1, message: error.message });

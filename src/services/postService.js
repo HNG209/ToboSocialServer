@@ -4,6 +4,7 @@ const User = require('../models/user');
 const { getUserPosts } = require('../controllers/profileController');
 const { getUserPostsService } = require('./profileService');
 const likeServicev3 = require('./likeServicev3');
+const Notification = require('../models/notification');
 
 module.exports = {
     createPost: async (data) => {
@@ -109,12 +110,27 @@ module.exports = {
     likePostService: async (postId, userId) => {
         const post = await Post.findById(postId);
         if (!post) {
-            throw new Error('Post not found');
+            throw new Error('Bài viết không tồn tại');
         }
 
+        // Kiểm tra xem người dùng đã thích bài viết chưa
         if (!post.likes.includes(userId)) {
             post.likes.push(userId);
             await post.save();
+
+            // Tạo thông báo nếu người thích không phải là tác giả bài viết
+            if (post.author.toString() !== userId.toString()) {
+                await Notification.create({
+                    recipient: post.author, // Người nhận là tác giả bài viết
+                    sender: userId, // Người gửi là người đã thích bài viết
+                    type: 'post', // Loại thông báo
+                    title: 'Lượt thích mới trên bài viết của bạn',
+                    message: `Có người đã thích bài viết của bạn!`,
+                    relatedEntity: postId, // Tham chiếu đến bài viết được thích
+                    relatedEntityModel: 'post', // Loại mô hình của thực thể liên quan
+                    isRead: false, // Mặc định là chưa đọc
+                });
+            }
         }
 
         return post;

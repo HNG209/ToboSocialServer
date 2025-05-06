@@ -1,4 +1,6 @@
 const adminService = require('../services/adminService');
+const mongoose = require('mongoose');
+
 
 // === DASHBOARD ===
 const getDashboard = async (req, res) => {
@@ -226,12 +228,34 @@ const markNotificationAsRead = async (req, res) => {
 
 const markAllNotificationsAsRead = async (req, res) => {
     try {
-        const userId = req.user._id; // Giả định userId lấy từ middleware xác thực
-        console.log('markAllNotificationsAsRead for user:', userId);
-        await adminService.markAllNotificationsAsRead(userId);
-        res.status(200).json({ errorCode: 0, message: 'Đã đánh dấu tất cả thông báo là đã xem' });
+        console.log('markAllNotificationsAsRead received request:', {
+            body: req.body,
+            headers: req.headers
+        });
+        const { userId } = req.body;
+        if (!userId) {
+            console.error('Missing userId in request body');
+            throw new Error('Thiếu userId');
+        }
+        if (!mongoose.isValidObjectId(userId)) {
+            console.error('Invalid userId:', userId);
+            throw new Error('userId không hợp lệ');
+        }
+        console.log('Processing markAllNotificationsAsRead for user:', userId);
+        const result = await adminService.markAllNotificationsAsRead(userId);
+        console.log('Update result:', result);
+        if (result.nModified === 0) {
+            return res.status(200).json({
+                errorCode: 0,
+                message: 'Không có thông báo nào cần đánh dấu là đã xem'
+            });
+        }
+        res.status(200).json({
+            errorCode: 0,
+            message: 'Đã đánh dấu tất cả thông báo là đã xem'
+        });
     } catch (err) {
-        console.error('Error in markAllNotificationsAsRead:', err);
+        console.error('Error in markAllNotificationsAsRead:', err.message);
         res.status(500).json({ errorCode: 1, message: err.message });
     }
 };

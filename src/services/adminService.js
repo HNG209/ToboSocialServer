@@ -478,7 +478,12 @@ const markNotificationAsRead = async (notificationId) => {
 // Đánh dấu tất cả thông báo của người dùng là đã xem
 const markAllNotificationsAsRead = async (userId) => {
     console.log('Marking all notifications as read for user:', userId);
-    return Notification.updateMany({ recipient: userId, isRead: false }, { isRead: true });
+    const result = await Notification.updateMany(
+        { recipient: userId, isRead: false },
+        { isRead: true }
+    );
+    console.log('Notifications updated:', result.nModified);
+    return result;
 };
 
 module.exports = {

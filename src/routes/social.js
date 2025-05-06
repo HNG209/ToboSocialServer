@@ -28,13 +28,13 @@ const {
 const { register, login } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
 const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI, postLikeComment, postUnlikeComment } = require('../controllers/commentController');
-const { postCreateNotification, postUpdateNotification, deleteNotificationAPI, markNotificationAsRead, markAllNotificationsAsRead, getAllNotifications } = require('../controllers/notificationController');
+const { postCreateNotification, postUpdateNotification, deleteNotificationAPI, markNotificationAsRead, getAllNotifications } = require('../controllers/notificationController');
 const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
 const { getCommentsByPost, getCommentsByPostv2, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
 const likeControllerv3 = require('../controllers/likeControllerv3');
 const { createReport } = require('../controllers/reportController');
-const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser } = require('../controllers/adminController');
+const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser, markAllNotificationsAsRead } = require('../controllers/adminController');
 const { getCurrentUser, updateUserProfile, updateUserPassword } = require('../controllers/adminUserController');
 const FollowerControllerv2 = require('../controllers/followControllerv2');
 
