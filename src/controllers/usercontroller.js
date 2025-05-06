@@ -10,7 +10,8 @@ const {
     registerUserService,
     getUserById,
     searchUserService,
-    getUserPostsByUserId
+    getUserPostsByUserId,
+    getUserByIdv2
 } = require("../services/userService");
 
 module.exports = {
@@ -27,6 +28,16 @@ module.exports = {
     getUserByIdAPI: async (req, res) => {
         const id = req.params.id;
         const rs = await getUserById(id);
+        if (!rs) {
+            return res.status(404).json({ errorCode: 1, message: 'User not found' });
+        }
+        res.status(200).json({ errorCode: 0, result: rs });
+    },
+
+    getUserByIdAPIv2: async (req, res) => {
+        const id = req.params.id;
+        const { currentUserId } = req.query;
+        const rs = await getUserByIdv2(id, currentUserId); // trả về có follow hay chưa
         if (!rs) {
             return res.status(404).json({ errorCode: 1, message: 'User not found' });
         }
