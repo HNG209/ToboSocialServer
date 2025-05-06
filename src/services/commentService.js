@@ -1,16 +1,39 @@
 const Comment = require('../models/comment');
 const aqp = require('api-query-params');
+const Notification = require('../models/notification');
+const Post = require('../models/post');
 
 module.exports = {
-    //Hung sua lai
     createCommentService: async (data) => {
+        // Tạo và lưu bình luận mới
         const newComment = await new Comment(data).save();
-        return await newComment.populate({
+
+        // Populate thông tin người dùng cho phản hồi
+        const populatedComment = await newComment.populate({
             path: 'user',
             select: 'username profile.avatar'
         });
+
+        // Lấy thông tin bài viết và chủ bài viết
+        const post = await Post.findById(newComment.post).populate('author');
+
+        // Tạo thông báo nếu người bình luận không phải chủ bài viết
+        if (post && post.author && post.author._id.toString() !== data.user.toString()) {
+            await Notification.create({
+                recipient: post.author._id, // Chủ bài viết
+                sender: data.user, // Người bình luận
+                type: 'comment',
+                title: 'Bình luận mới trên bài viết của bạn',
+                message: `${populatedComment.user.username} đã bình luận trên bài viết của bạn.`,
+                relatedEntity: newComment._id, // ID của bình luận
+                relatedEntityModel: 'comment',
+                isRead: false
+            });
+        }
+
+        return populatedComment;
     },
-    
+
     getCommentService: async (queryString) => {
         const page = queryString.page || 1;
         const { filter, limit = 10, population } = aqp(queryString);
