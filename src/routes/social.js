@@ -11,7 +11,8 @@ const {
     getUserByIdAPI,
     getSearchUser,
     getUserByUsername,
-    getPostsByUserId
+    getPostsByUserId,
+    getUserByIdAPIv2
 } = require('../controllers/usercontroller');
 const {
     postCreatePost,
@@ -35,6 +36,7 @@ const likeControllerv3 = require('../controllers/likeControllerv3');
 const { createReport } = require('../controllers/reportController');
 const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser } = require('../controllers/adminController');
 const { getCurrentUser, updateUserProfile, updateUserPassword } = require('../controllers/adminUserController');
+const FollowerControllerv2 = require('../controllers/followControllerv2');
 
 const routerAPI = express.Router()
 
@@ -101,7 +103,7 @@ routerAPI.get('/users/:id/posts', getUserPostsAPI); // lấy bài viết của n
 routerAPI.post('/users/login', postLogin);
 routerAPI.post('/users/logout', postLogout);
 routerAPI.post('/users/forgot-password', postForgotPassword);
-routerAPI.get('/users/:id', getUserByIdAPI); // lấy thông tin người dùng theo id
+routerAPI.get('/users/:id', getUserByIdAPIv2); // lấy thông tin người dùng theo id
 routerAPI.post('/users/register', postRegister);
 
 // routerAPI.post('/like/:postId', likeControllerV2.likePost);
@@ -116,6 +118,22 @@ routerAPI.post('/unlike/:targetId', likeControllerv3.unlike);
 routerAPI.post('/is-liked/:targetId', likeControllerv3.isLiked);
 routerAPI.post('/like/count/:targetId', likeControllerv3.countLikes);
 routerAPI.post('/likers/:targetId', likeControllerv3.getLikers);
+
+// Follow người dùng
+routerAPI.post('/follow', FollowerControllerv2.follow);
+
+// Unfollow người dùng
+routerAPI.post('/unfollow', FollowerControllerv2.unfollow);
+
+// Lấy danh sách người đang được user follow
+routerAPI.get('/:userId/following', FollowerControllerv2.getFollowing);
+
+// Lấy danh sách người đang follow user
+routerAPI.get('/:userId/followers', FollowerControllerv2.getFollowers);
+
+// Kiểm tra subjectId đã follow followingId chưa
+routerAPI.get('/is-following', FollowerControllerv2.isFollowing);
+
 
 routerAPI.get('/:postId/author', getPostAuthor);
 //search

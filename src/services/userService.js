@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 const User = require('../models/user');
 const { get } = require('mongoose');
 const Post = require('../models/post');
+const Follower = require('../models/follower');
 
 // 1. Setup transporter gửi email
 const transporter = nodemailer.createTransport({
@@ -37,6 +38,35 @@ module.exports = {
     getUserById: async (id) => {
         const rs = await User.findById(id).exec();
         return rs;
+    },
+
+    getUserByIdv2: async (id, currentUserId) => {
+        const user = await User.findById(id).lean();
+
+        if (!user) {
+            throw new Error('Người dùng không tồn tại');
+        }
+
+        if(currentUserId == undefined || currentUserId == null){
+            return user;
+        }
+
+
+        // Nếu người dùng đang xem trang cá nhân của chính mình
+        if (id.toString() === currentUserId.toString()) {
+            return user;
+        }
+
+        // Kiểm tra currentUser có follow user này không
+        const isFollowing = await Follower.exists({
+            subject: currentUserId,
+            following: id
+        });
+
+        return {
+            ...user,
+            isFollowedByCurrentUser: !!isFollowing
+        };
     },
 
     updateUserService: async (data) => {
