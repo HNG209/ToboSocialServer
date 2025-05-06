@@ -1,5 +1,6 @@
 const Post = require('../models/post');
 const aqp = require('api-query-params');
+const likeServicev3 = require('./likeServicev3');
 
 const getUserPostsService = async (userId, query) => {
     const page = parseInt(query.page) || 1;
@@ -12,6 +13,11 @@ const getUserPostsService = async (userId, query) => {
         .skip(offset)
         .limit(limit)
         .lean();
+
+    // Gán likeCount cho từng post
+    for (let post of posts) {
+        post.likeCount = (await likeServicev3.countLikesService(post._id, 'post')).likes;
+    }
 
     return posts;
 };

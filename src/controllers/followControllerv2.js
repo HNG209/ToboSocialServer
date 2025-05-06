@@ -1,6 +1,21 @@
 const FollowerService = require('../services/followServicev2');
 
 class FollowerControllerv2 {
+    // static async countFollowers(req, res) {
+    //     try {
+    //         const { userId } = req.params;
+
+    //         if (!userId) {
+    //             return res.status(400).json({ message: 'userId là bắt buộc.' });
+    //         }
+
+    //         const count = await FollowerService.countFollowers(userId);
+    //         return res.status(200).json({ userId, followerCount: count });
+    //     } catch (err) {
+    //         console.error("Lỗi khi đếm follower:", err);
+    //         return res.status(500).json({ message: 'Lỗi server.' });
+    //     }
+    // }
     // GET /is-following?subjectId=...&followingId=...
     static async isFollowing(req, res) {
         try {
