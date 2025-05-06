@@ -1,3 +1,5 @@
+const Post = require('../models/post');
+const User = require('../models/user');
 const {
     createPost,
     getPost,
@@ -10,13 +12,44 @@ const {
 } = require('../services/postService');
 
 module.exports = {
+    // postCreatePost: async (req, res) => {
+    //     const rs = await createPost(req.body);
+    //     res.status(200).json({
+    //         errorCode: 0,
+    //         result: rs
+    //     });
+    // },
+
     postCreatePost: async (req, res) => {
-        const rs = await createPost(req.body);
-        res.status(200).json({
-            errorCode: 0,
-            result: rs
-        });
+        try {
+            const { caption, mediaFiles, author } = req.body;
+
+            // Kiểm tra dữ liệu đầu vào
+            if (!author) {
+                return res.status(400).json({ errorCode: 1, message: 'Author is required' });
+            }
+
+            // Tạo bài viết
+            const post = new Post({
+                author,
+                caption,
+                mediaFiles: mediaFiles || [],
+                likes: [],
+                comments: [],
+            });
+
+            // Lưu bài viết
+            await post.save();
+
+            // Tăng postCount của người dùng
+            await User.findByIdAndUpdate(author, { $inc: { postCount: 1 } });
+
+            return res.status(201).json({ errorCode: 0, result: post });
+        } catch (error) {
+            return res.status(500).json({ errorCode: 1, message: error.message || 'Failed to create post' });
+        }
     },
+
 
     getAllPost: async (req, res) => {
         const rs = await getPost(req.query);
