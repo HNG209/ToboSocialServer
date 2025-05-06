@@ -41,17 +41,16 @@ module.exports = {
         const page = queryString.page || 1;
         const { filter, limit = 10, population } = aqp(queryString);
         delete filter.page;
-
+        
         const offset = (page - 1) * limit;
-        const rs = await Post.find(filter)
+        const posts = await Post.find(filter)
             .populate('author')
             .populate('likes')
             .populate('comments')
             .skip(offset)
-            .limit(limit)
-            .exec();
+            .limit(limit);
 
-        return rs;
+        return posts;
     },
 
     //Hung them vo
@@ -160,7 +159,7 @@ module.exports = {
             throw new Error('Post not found');
         }
 
-        // post.likeCount = (await likeServicev3.countLikesService(id, 'post')).likes
+        post.likeCount = (await likeServicev3.countLikesService(id, 'post')).likes
 
         return post;
     },

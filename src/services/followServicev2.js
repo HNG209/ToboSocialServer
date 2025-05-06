@@ -1,6 +1,18 @@
 const Follower = require('../models/follower'); // Cập nhật đường dẫn theo dự án của bạn
 
 class FollowerService {
+    // Đếm số lượng người đang follow userId
+    static async countFollowers(userId) {
+        const count = await Follower.countDocuments({ following: userId });
+        return count;
+    }
+
+    // Đếm số người mà user đang theo dõi
+    static async countFollowing(userId) {
+        const count = await Follower.countDocuments({ subject: userId });
+        return count;
+    }
+
     // Kiểm tra subjectId đã follow followingId hay chưa
     static async isFollowing(subjectId, followingId) {
         const follow = await Follower.findOne({ subject: subjectId, following: followingId });

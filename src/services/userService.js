@@ -4,6 +4,7 @@ const User = require('../models/user');
 const { get } = require('mongoose');
 const Post = require('../models/post');
 const Follower = require('../models/follower');
+const { countFollowers, countFollowing } = require('./followServicev2');
 
 // 1. Setup transporter gửi email
 const transporter = nodemailer.createTransport({
@@ -39,9 +40,11 @@ module.exports = {
         const rs = await User.findById(id).exec();
         return rs;
     },
-
     getUserByIdv2: async (id, currentUserId) => {
         const user = await User.findById(id).lean();
+
+        user.countFollower = await countFollowers(id);
+        user.countFollowing = await countFollowing(id);
 
         if (!user) {
             throw new Error('Người dùng không tồn tại');

@@ -98,7 +98,7 @@ routerAPI.post('/posts/:id/unlike', unlikePost);
 routerAPI.post('/like-comment', postLikeComment); // thích bình luận
 routerAPI.post('/unlike-comment', postUnlikeComment); // bỏ thích bình luận
 routerAPI.get('/posts/:id', getPostDetailAPI); // lấy chi tiết bài viết
-routerAPI.get('/users/:id/posts', getUserPostsAPI); // lấy bài viết của người dùng
+// routerAPI.get('/users/:id/posts', getUserPostsAPI); // lấy bài viết của người dùng
 
 routerAPI.post('/users/login', postLogin);
 routerAPI.post('/users/logout', postLogout);
