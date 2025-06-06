@@ -134,7 +134,6 @@ module.exports = {
 
     getPostAuthor: async (req, res) => {
         const { postId } = req.params;
-        console.log(postId)
         const rs = await getAuthorByPostIdService(postId)
 
         res.status(200).json({

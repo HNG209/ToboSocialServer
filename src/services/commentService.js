@@ -14,6 +14,12 @@ module.exports = {
             select: 'username profile.avatar'
         });
 
+        //kiểm tra xem bình luận có replyTo hay không
+        if (data.replyTo) {
+            // Tăng countReply của bình luận gốc nếu có replyTo
+            await Comment.findByIdAndUpdate(data.replyTo, { $inc: { countReply: 1 } });
+        }
+
         // Lấy thông tin bài viết và chủ bài viết
         const post = await Post.findById(newComment.post).populate('author');
 

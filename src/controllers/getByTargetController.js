@@ -4,7 +4,8 @@ const {
     getFollowersService,
     getFollowingService,
     getStoriesByUserService,
-    getCommentsByPostServicev2
+    getCommentsByPostServicev2,
+    getRepliedCommentsService
 } = require('../services/getByTargetService');
 
 module.exports = {
@@ -18,6 +19,14 @@ module.exports = {
         const { postId } = req.params;
 
         const comments = await getCommentsByPostServicev2(postId, userId, req.query);
+        res.status(200).json({ errorCode: 0, result: comments });
+    },
+
+    getRepliedComments: async (req, res) => {
+        const { commentId } = req.params;
+        const { userId } = req.body;
+
+        const comments = await getRepliedCommentsService(commentId, userId, req.query);
         res.status(200).json({ errorCode: 0, result: comments });
     },
 

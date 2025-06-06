@@ -2,6 +2,7 @@ const Like = require('../models/likev2');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 const User = require('../models/user');
+const { on } = require('nodemailer/lib/xoauth2');
 
 module.exports = {
     likeService: async (userId, targetId, onModel) => {
@@ -24,6 +25,13 @@ module.exports = {
             return { status: 400, error: 'Bạn đã like rồi.' };
         }
 
+        // tăng số lượng like cho bài viết hoặc bình luận
+        if (onModel === 'post') {
+            await Post.findByIdAndUpdate(targetId, { $inc: { likeCount: 1 } });
+        } else if (onModel === 'comment') {
+            await Comment.findByIdAndUpdate(targetId, { $inc: { likeCount: 1 } });
+        }
+
         await Like.create({ user: userId, target: targetId, onModel });
 
         return { targetId, onModel, status: 200, isLiked: true, message: 'Like thành công!' };
@@ -39,6 +47,13 @@ module.exports = {
             return { status: 400, error: 'Bạn chưa like đối tượng này.' };
         }
 
+        // giảm số lượng like cho bài viết hoặc bình luận
+        if (onModel === 'post') {
+            await Post.findByIdAndUpdate(targetId, { $inc: { likeCount: -1 } });
+        } else if (onModel === 'comment') {
+            await Comment.findByIdAndUpdate(targetId, { $inc: { likeCount: -1 } });
+        }
+
         await Like.deleteOne({ _id: like._id });
 
         return { targetId, onModel, status: 200, isLiked: false, message: 'Unlike thành công!' };
@@ -46,6 +61,17 @@ module.exports = {
 
     isLikedService: async (userId, targetId, onModel) => {
         const liked = await Like.exists({ user: userId, target: targetId, onModel });
+
+        // nếu là bình luận
+        if (onModel === 'comment') {
+            // kiểm tra xem bình luận có rootComment không
+            const comment = await Comment.findById(targetId);
+            if (comment && comment.rootComment) {
+                //trả về trạng thái đã like và id của bình luận gốc
+                return { status: 200, isLiked: !!liked, rootCommentId: comment.rootComment };
+            }
+        }
+
         return { status: 200, isLiked: !!liked };
     },
 

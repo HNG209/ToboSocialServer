@@ -30,7 +30,7 @@ const { followUser, unfollowUser } = require('../controllers/followController');
 const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI, postLikeComment, postUnlikeComment } = require('../controllers/commentController');
 const { postCreateNotification, postUpdateNotification, deleteNotificationAPI, markNotificationAsRead, getAllNotifications } = require('../controllers/notificationController');
 const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
-const { getCommentsByPost, getCommentsByPostv2, getLikesByPost, getFollowers, getFollowing, getStoriesByUser } = require('../controllers/getByTargetController');
+const { getCommentsByPost, getCommentsByPostv2, getLikesByPost, getFollowers, getFollowing, getStoriesByUser, getRepliedComments } = require('../controllers/getByTargetController');
 const { getUserPosts } = require('../controllers/profileController');
 const likeControllerv3 = require('../controllers/likeControllerv3');
 const { createReport } = require('../controllers/reportController');
@@ -87,6 +87,7 @@ routerAPI.delete('/stories', deleteStoryAPI);
 // routerAPI.get('/posts/:postId/comments', getCommentsByPost);
 routerAPI.post('/posts/:postId/comments', getCommentsByPostv2); //v2: có trả về trạng thái đã like bình luận của người dùng
 routerAPI.get('/posts/:postId/likes', getLikesByPost);
+routerAPI.post('/comments/:commentId/replies', getRepliedComments); // lấy bình luận trả lời của bình luận gốc
 routerAPI.get('/users/:id/followers', getFollowers);
 routerAPI.get('/users/:id/following', getFollowing);
 routerAPI.get('/users/:id/stories', getStoriesByUser);

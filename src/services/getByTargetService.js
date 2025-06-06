@@ -27,7 +27,55 @@ module.exports = {
         const { limit = 10 } = aqp(query);
         const offset = (page - 1) * limit;
 
-        const comments = await Comment.find({ post: postId })
+        // replyTo là trường để xác định bình luận trả lời, nếu là null thì là bình luận gốc
+        const comments = await Comment.find({ post: postId, replyTo: null })
+            .populate({
+                path: 'user',
+                select: 'username profile.avatar'
+            })
+            .skip(offset)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+        // lọc các comment mà người dùng không còn tồn tại
+        const validComments = comments.filter(comment => comment.user && comment.user._id);
+        // xoá các comment trong database mà người dùng không còn tồn tại
+        await Comment.deleteMany({ _id: { $in: comments.map(c => c._id) }, user: null });
+
+        // thêm trường replyTo (mặc định là null) vào các comment chưa có trường này, lưu xuống database
+        const commentsToUpdate = validComments.filter(comment => !comment.replyTo);
+        if (commentsToUpdate.length > 0) {
+            await Comment.updateMany(
+                { _id: { $in: commentsToUpdate.map(c => c._id) } },
+                { $set: { replyTo: null } }
+            );
+        }
+
+        if (userId) {
+            const commentIds = validComments.map(c => c._id);
+            const likedComments = await Like.find({
+                user: userId,
+                target: { $in: commentIds },
+                onModel: 'comment'
+            }).select('target');
+
+            const likedSet = new Set(likedComments.map(like => like.target.toString()));
+
+            // Gắn thêm trường isLiked vào từng comment
+            validComments.forEach(comment => {
+                comment._doc.isLiked = likedSet.has(comment._id.toString());
+            });
+        }
+
+        return validComments;
+    },
+
+    getRepliedCommentsService: async (commentId, userId, query) => {
+        const page = parseInt(query.page) || 1;
+        const { limit = 10 } = aqp(query);
+        const offset = (page - 1) * limit;
+
+        const comments = await Comment.find({ rootComment: commentId })
             .populate({
                 path: 'user',
                 select: 'username profile.avatar'
