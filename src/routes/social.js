@@ -25,7 +25,7 @@ const {
     getPostDetailAPI,
     getPostAuthor
 } = require('../controllers/postController');
-const { register, login } = require('../controllers/authController');
+const { register, login, registerv2, loginv2, refresh } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
 const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI, postLikeComment, postUnlikeComment } = require('../controllers/commentController');
 const { postCreateNotification, postUpdateNotification, deleteNotificationAPI, markNotificationAsRead, getAllNotifications } = require('../controllers/notificationController');
@@ -37,6 +37,9 @@ const { createReport } = require('../controllers/reportController');
 const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser, markAllNotificationsAsRead } = require('../controllers/adminController');
 const { getCurrentUser, updateUserProfile, updateUserPassword } = require('../controllers/adminUserController');
 const FollowerControllerv2 = require('../controllers/followControllerv2');
+const { validateToken } = require('../services/tokenService');
+const { checkToken } = require('../controllers/tokenController');
+const authenticateToken = require('../middlewares/authMiddleware');
 
 const routerAPI = express.Router()
 
@@ -61,8 +64,15 @@ routerAPI.get('/posts', getAllPost);
 routerAPI.put('/posts', postUpdatePost);
 routerAPI.delete('/posts', deletePostAPI);
 
-routerAPI.post('/register', register);
-routerAPI.post('/login', login);
+// revert
+// routerAPI.post('/register', register);
+// routerAPI.post('/login', login);
+
+// v2
+routerAPI.post('/register', registerv2);
+routerAPI.post('/login', loginv2);
+routerAPI.get('/validate', checkToken);
+routerAPI.post('/refresh', refresh);
 
 routerAPI.post('/users/:id/follow', followUser);
 routerAPI.post('/users/:id/unfollow', unfollowUser);
@@ -74,6 +84,8 @@ routerAPI.post('/comments', postCreateComment);
 routerAPI.get('/comments', getAllComments);
 routerAPI.put('/comments', postUpdateComment);
 routerAPI.delete('/comments', deleteCommentAPI);
+routerAPI.get('/posts/:postId/comments', authenticateToken, getCommentsByPostv2); //v2: có trả về trạng thái đã like bình luận của người dùng
+routerAPI.post('/comments/:commentId/replies', authenticateToken, getRepliedComments); // lấy bình luận trả lời của bình luận gốc
 
 routerAPI.post('/notifications', postCreateNotification);
 routerAPI.get('/notifications', getAllNotifications);
@@ -85,9 +97,7 @@ routerAPI.get('/stories', getAllStories);
 routerAPI.delete('/stories', deleteStoryAPI);
 
 // routerAPI.get('/posts/:postId/comments', getCommentsByPost);
-routerAPI.post('/posts/:postId/comments', getCommentsByPostv2); //v2: có trả về trạng thái đã like bình luận của người dùng
 routerAPI.get('/posts/:postId/likes', getLikesByPost);
-routerAPI.post('/comments/:commentId/replies', getRepliedComments); // lấy bình luận trả lời của bình luận gốc
 routerAPI.get('/users/:id/followers', getFollowers);
 routerAPI.get('/users/:id/following', getFollowing);
 routerAPI.get('/users/:id/stories', getStoriesByUser);
@@ -98,7 +108,7 @@ routerAPI.post('/posts/:id/unlike', unlikePost);
 
 routerAPI.post('/like-comment', postLikeComment); // thích bình luận
 routerAPI.post('/unlike-comment', postUnlikeComment); // bỏ thích bình luận
-routerAPI.get('/posts/:id', getPostDetailAPI); // lấy chi tiết bài viết
+routerAPI.get('/posts/:id', authenticateToken, getPostDetailAPI); // lấy chi tiết bài viết
 // routerAPI.get('/users/:id/posts', getUserPostsAPI); // lấy bài viết của người dùng
 
 routerAPI.post('/users/login', postLogin);
@@ -116,7 +126,7 @@ routerAPI.post('/users/register', postRegister);
 //v3
 routerAPI.post('/like/:targetId', likeControllerv3.like);
 routerAPI.post('/unlike/:targetId', likeControllerv3.unlike);
-routerAPI.post('/is-liked/:targetId', likeControllerv3.isLiked);
+routerAPI.get('/is-liked/:onModel/:targetId', authenticateToken, likeControllerv3.isLiked);
 routerAPI.post('/like/count/:targetId', likeControllerv3.countLikes);
 routerAPI.post('/likers/:targetId', likeControllerv3.getLikers);
 

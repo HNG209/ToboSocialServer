@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const path = require('path')
 const configViewEngine = require("./config/viewEngine")
-const webRoutes = require("./routes/web")
+// const webRoutes = require("./routes/web")
 const apiRoutes = require("./routes/social")
 const fileUpload = require('express-fileupload')
 const { MongoClient } = require('mongodb');

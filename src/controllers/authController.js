@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const { registerSchema, loginSchema } = require('../validations/authValidation');
+const { registerUser, loginUser, logoutUser, refreshAccessToken } = require('../services/authService');
 const User = require('../models/user');
 
 // Đăng ký
@@ -64,4 +65,45 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { register, login };
+const registerv2 = async (req, res) => {
+    try {
+        const result = await registerUser(req.body);
+        res.status(201).json(result);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+const loginv2 = async (req, res) => {
+    try {
+        const result = await loginUser(req.body);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(401).json({ message: error.message });
+    }
+};
+
+const logout = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        await logoutUser(userId);
+        res.json({ message: 'Logged out successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const refresh = async (req, res) => {
+    try {
+        const { refreshToken } = req.body;
+        if (!refreshToken) return res.status(400).json({ message: 'Missing refresh token' });
+
+        const newToken = await refreshAccessToken(refreshToken);
+        res.json(newToken);
+    } catch (error) {
+        res.status(403).json({ message: error.message });
+    }
+};
+
+
+module.exports = { register, login, registerv2, loginv2, logout, refresh };

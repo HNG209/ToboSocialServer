@@ -11,7 +11,7 @@ const profileSchema = new Schema({
 
 const userSchema = new Schema({
     username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: false, unique: true },
     password: { type: String, required: true },
     fullName: String,
     phone: String,
@@ -20,6 +20,9 @@ const userSchema = new Schema({
 
     followers: [{ type: Schema.Types.ObjectId, ref: 'user' }],
     following: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+
+    followersCount: { type: Number, default: 0 },
+    followingCount: { type: Number, default: 0 },
 
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     isVerified: { type: Boolean, default: false },

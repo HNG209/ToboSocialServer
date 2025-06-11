@@ -15,8 +15,8 @@ module.exports = {
     },
 
     getCommentsByPostv2: async (req, res) => {
-        const { userId } = req.body;
         const { postId } = req.params;
+        const userId = req.user.id; // Lấy từ accessToken
 
         const comments = await getCommentsByPostServicev2(postId, userId, req.query);
         res.status(200).json({ errorCode: 0, result: comments });
@@ -24,7 +24,7 @@ module.exports = {
 
     getRepliedComments: async (req, res) => {
         const { commentId } = req.params;
-        const { userId } = req.body;
+        const userId = req.user.id; // Lấy từ accessToken
 
         const comments = await getRepliedCommentsService(commentId, userId, req.query);
         res.status(200).json({ errorCode: 0, result: comments });

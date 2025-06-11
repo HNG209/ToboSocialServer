@@ -24,8 +24,9 @@ module.exports = {
     },
 
     isLiked: async (req, res) => {
-        const { targetId } = req.params;
-        const { onModel, userId } = req.body;
+        const { onModel, targetId } = req.params;
+
+        const userId = req.user.id; // Lấy từ accessToken
 
         const result = await likeService.isLikedService(userId, targetId, onModel);
         return res.status(result.status).json({

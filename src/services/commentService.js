@@ -14,10 +14,10 @@ module.exports = {
             select: 'username profile.avatar'
         });
 
-        //kiểm tra xem bình luận có replyTo hay không
-        if (data.replyTo) {
-            // Tăng countReply của bình luận gốc nếu có replyTo
-            await Comment.findByIdAndUpdate(data.replyTo, { $inc: { countReply: 1 } });
+        //kiểm tra xem bình luận có root hay không
+        if (data.rootComment) {
+            // Tăng countReply của bình luận gốc nếu có rootComment
+            await Comment.findByIdAndUpdate(data.rootComment, { $inc: { countReply: 1 } });
         }
 
         // Lấy thông tin bài viết và chủ bài viết
