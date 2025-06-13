@@ -9,7 +9,9 @@ const {
 
 module.exports = {
     postCreateComment: async (req, res) => {
-        const rs = await createCommentService(req.body);
+        const userId = req.user.id; // Lấy từ accessToken
+        console.log('userId:', userId);
+        const rs = await createCommentService({ ...req.body, user: userId });
         res.status(200).json({ errorCode: 0, result: rs });
     },
 

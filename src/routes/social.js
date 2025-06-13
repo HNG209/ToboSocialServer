@@ -12,7 +12,8 @@ const {
     getSearchUser,
     getUserByUsername,
     getPostsByUserId,
-    getUserByIdAPIv2
+    getUserByIdAPIv2,
+    getUserProfile
 } = require('../controllers/usercontroller');
 const {
     postCreatePost,
@@ -25,13 +26,13 @@ const {
     getPostDetailAPI,
     getPostAuthor
 } = require('../controllers/postController');
-const { register, login, registerv2, loginv2, refresh } = require('../controllers/authController');
+const { register, login, registerv2, loginv2, refresh, changePassword } = require('../controllers/authController');
 const { followUser, unfollowUser } = require('../controllers/followController');
 const { postCreateComment, getAllComments, postUpdateComment, deleteCommentAPI, postLikeComment, postUnlikeComment } = require('../controllers/commentController');
 const { postCreateNotification, postUpdateNotification, deleteNotificationAPI, markNotificationAsRead, getAllNotifications } = require('../controllers/notificationController');
 const { postCreateStory, deleteStoryAPI, getAllStories } = require('../controllers/storyController');
 const { getCommentsByPost, getCommentsByPostv2, getLikesByPost, getFollowers, getFollowing, getStoriesByUser, getRepliedComments } = require('../controllers/getByTargetController');
-const { getUserPosts } = require('../controllers/profileController');
+const { getUserPosts, getProfilePost } = require('../controllers/profileController');
 const likeControllerv3 = require('../controllers/likeControllerv3');
 const { createReport } = require('../controllers/reportController');
 const { getDashboard, getUsers, banUser, deleteUser, getPosts, removePost, getAllComment, removeComment, getAllReports, markReportDone, banMultipleUsers, deleteMultipleUsers, exportUsers, unbanUser, restorePost, getPostReportCount, warnUser, markAllNotificationsAsRead } = require('../controllers/adminController');
@@ -73,6 +74,7 @@ routerAPI.post('/register', registerv2);
 routerAPI.post('/login', loginv2);
 routerAPI.get('/validate', checkToken);
 routerAPI.post('/refresh', refresh);
+routerAPI.put('/password', changePassword); // đổi mật khẩu
 
 routerAPI.post('/users/:id/follow', followUser);
 routerAPI.post('/users/:id/unfollow', unfollowUser);
@@ -80,10 +82,10 @@ routerAPI.post('/users/:id/unfollow', unfollowUser);
 routerAPI.post('/posts/:id/like', likePost);
 routerAPI.post('/posts/:id/unlike', unlikePost);
 
-routerAPI.post('/comments', postCreateComment);
-routerAPI.get('/comments', getAllComments);
-routerAPI.put('/comments', postUpdateComment);
-routerAPI.delete('/comments', deleteCommentAPI);
+routerAPI.post('/comments', authenticateToken, postCreateComment);
+routerAPI.get('/comments', authenticateToken, getAllComments);
+routerAPI.put('/comments', authenticateToken, postUpdateComment);
+routerAPI.delete('/comments', authenticateToken, deleteCommentAPI);
 routerAPI.get('/posts/:postId/comments', authenticateToken, getCommentsByPostv2); //v2: có trả về trạng thái đã like bình luận của người dùng
 routerAPI.post('/comments/:commentId/replies', authenticateToken, getRepliedComments); // lấy bình luận trả lời của bình luận gốc
 
@@ -101,7 +103,6 @@ routerAPI.get('/posts/:postId/likes', getLikesByPost);
 routerAPI.get('/users/:id/followers', getFollowers);
 routerAPI.get('/users/:id/following', getFollowing);
 routerAPI.get('/users/:id/stories', getStoriesByUser);
-routerAPI.get('/users/:id/posts', getUserPosts);
 
 routerAPI.post('/posts/:id/like', likePost);
 routerAPI.post('/posts/:id/unlike', unlikePost);
@@ -116,6 +117,9 @@ routerAPI.post('/users/logout', postLogout);
 routerAPI.post('/users/forgot-password', postForgotPassword);
 routerAPI.get('/users/:id', getUserByIdAPIv2); // lấy thông tin người dùng theo id
 routerAPI.post('/users/register', postRegister);
+routerAPI.get('/user/profile', authenticateToken, getUserProfile);
+routerAPI.get('/user/profile/posts', authenticateToken, getProfilePost);
+routerAPI.get('/user/:id/posts', authenticateToken, getUserPosts);
 
 // routerAPI.post('/like/:postId', likeControllerV2.likePost);
 // routerAPI.post('/unlike/:postId', likeControllerV2.unlikePost);
@@ -124,8 +128,8 @@ routerAPI.post('/users/register', postRegister);
 // routerAPI.get('/:postId/users', likeControllerV2.getPostLikers);
 
 //v3
-routerAPI.post('/like/:targetId', likeControllerv3.like);
-routerAPI.post('/unlike/:targetId', likeControllerv3.unlike);
+routerAPI.post('/like/:targetId', authenticateToken, likeControllerv3.like);
+routerAPI.post('/unlike/:targetId', authenticateToken, likeControllerv3.unlike);
 routerAPI.get('/is-liked/:onModel/:targetId', authenticateToken, likeControllerv3.isLiked);
 routerAPI.post('/like/count/:targetId', likeControllerv3.countLikes);
 routerAPI.post('/likers/:targetId', likeControllerv3.getLikers);
@@ -146,7 +150,7 @@ routerAPI.get('/:userId/followers', FollowerControllerv2.getFollowers);
 routerAPI.get('/is-following', FollowerControllerv2.isFollowing);
 
 
-routerAPI.get('/:postId/author', getPostAuthor);
+routerAPI.get('/:postId/author', authenticateToken, getPostAuthor);
 //search
 routerAPI.get('/search', getSearchUser);
 routerAPI.get('/by-username/:username', getUserByUsername);

@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt');
 const { registerSchema, loginSchema } = require('../validations/authValidation');
-const { registerUser, loginUser, logoutUser, refreshAccessToken } = require('../services/authService');
+const { registerUser, loginUser, logoutUser, refreshAccessToken, changePasswordService } = require('../services/authService');
 const User = require('../models/user');
 
 // Đăng ký
+// deprecated: Sử dụng registerv2 thay thế
 const register = async (req, res) => {
     const { error } = registerSchema.validate(req.body);
     if (error) {
@@ -36,6 +37,7 @@ const register = async (req, res) => {
 };
 
 // Đăng nhập
+// deprecated: Sử dụng loginv2 thay thế
 const login = async (req, res) => {
     const { error } = loginSchema.validate(req.body);
     if (error) {
@@ -76,12 +78,40 @@ const registerv2 = async (req, res) => {
 
 const loginv2 = async (req, res) => {
     try {
-        const result = await loginUser(req.body);
-        res.status(200).json(result);
+        const { username, password } = req.body;
+        const { accessToken, refreshToken, user } = await loginUser({ username, password });
+
+        // Set refreshToken vào cookie
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: true,             // Bật khi dùng HTTPS
+            sameSite: 'Strict',       // Hoặc 'Lax' nếu FE/BE khác domain
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 ngày
+        });
+
+        // Trả về accessToken và user
+        res.status(200).json({
+            errorCode: 0,
+            message: 'Login successful',
+            result: {
+                accessToken,
+                user
+            }
+        });
     } catch (error) {
-        res.status(401).json({ message: error.message });
+        res.status(400).json({ errorCode: 1, message: error.message });
     }
 };
+
+const changePassword = async (req, res) => {
+    const { userId, oldPassword, newPassword } = req.body;
+    try {
+        const result = await changePasswordService(userId, oldPassword, newPassword);
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ errorCode: 1, message: error.message });
+    }
+}
 
 const logout = async (req, res) => {
     try {
@@ -89,21 +119,21 @@ const logout = async (req, res) => {
         await logoutUser(userId);
         res.json({ message: 'Logged out successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ errorCode: 1, message: error.message });
     }
 };
 
 const refresh = async (req, res) => {
     try {
-        const { refreshToken } = req.body;
-        if (!refreshToken) return res.status(400).json({ message: 'Missing refresh token' });
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) return res.status(400).json({ errorCode: 1, message: 'Missing refresh token' });
 
         const newToken = await refreshAccessToken(refreshToken);
         res.json(newToken);
     } catch (error) {
-        res.status(403).json({ message: error.message });
+        res.status(403).json({ errorCode: 1, message: error.message });
     }
 };
 
 
-module.exports = { register, login, registerv2, loginv2, logout, refresh };
+module.exports = { register, login, registerv2, loginv2, logout, refresh, changePassword };

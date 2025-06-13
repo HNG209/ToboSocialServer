@@ -25,21 +25,38 @@ const registerUser = async ({ username, password }) => {
 const loginUser = async ({ username, password }) => {
     const user = await User.findOne({ username });
     if (!user) {
-        throw new Error('username not found');
+        throw new Error('User not found');
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
-        throw new Error('Invalid password');
+        throw new Error('Login failed, invalid password');
     }
 
     const token = await generateTokens(user);
 
-    return { message: 'Login successful', token };
+    return { message: 'Login successful', user, ...token };
 };
 
 const logoutUser = async (userId) => {
     await TokenModel.findOneAndDelete({ userId });
+};
+
+const changePasswordService = async (userId, oldPassword, newPassword) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    // const isMatch = oldPassword === user.password;
+    if (!isMatch) {
+        throw new Error('Old password is incorrect');
+    }
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedNewPassword;
+    await user.save();
+    return { message: 'Password changed successfully' };
 };
 
 const refreshAccessToken = async (refreshToken) => {
@@ -93,4 +110,5 @@ module.exports = {
     loginUser,
     logoutUser,
     refreshAccessToken,
+    changePasswordService,
 };

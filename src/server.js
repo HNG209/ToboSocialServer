@@ -11,14 +11,21 @@ const cors = require('cors');
 const connection = require("./config/database")
 const { log } = require('console')
 const mongoose = require('mongoose')
+const cookieParser = require('cookie-parser');
+
 
 const app = express()
 const port = process.env.PORT || 8888
 const hostname = process.env.HOST_NAME
 
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',   // FE domain
+  credentials: true                  // ✅ Cho phép gửi cookie và auth header
+}));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser());
 
 //config template engine
 configViewEngine(app)

@@ -3,7 +3,9 @@ const likeService = require('../services/likeServicev3');
 module.exports = {
     like: async (req, res) => {
         const { targetId } = req.params;
-        const { onModel, userId } = req.body;
+        const { onModel } = req.body;
+
+        const userId = req.user.id; // Lấy từ accessToken
 
         const result = await likeService.likeService(userId, targetId, onModel);
         return res.status(result.status).json({
@@ -14,7 +16,9 @@ module.exports = {
 
     unlike: async (req, res) => {
         const { targetId } = req.params;
-        const { onModel, userId } = req.body;
+        const { onModel } = req.body;
+
+        const userId = req.user.id; // Lấy từ accessToken
 
         const result = await likeService.unlikeService(userId, targetId, onModel);
         return res.status(result.status).json({

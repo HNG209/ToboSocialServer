@@ -36,10 +36,11 @@ module.exports = {
         return rs;
     },
 
-    getUserById: async (id) => {
+    getUserProfileService: async (id) => {
         const rs = await User.findById(id).exec();
         return rs;
     },
+
     getUserByIdv2: async (id, currentUserId) => {
         const user = await User.findById(id).lean();
 

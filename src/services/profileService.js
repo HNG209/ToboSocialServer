@@ -23,9 +23,8 @@ const getUserPostsService = async (userId, query) => {
     return posts;
 };
 
-const getUserPostsServicev2 = async (authorId, query) => {
+const getUserPostsServicev2 = async (authorId, userId, query) => {
     const page = parseInt(query.page) || 1;
-    const userId = query.userId;
 
     const { limit = 10, population } = aqp(query);
     const offset = (page - 1) * limit;

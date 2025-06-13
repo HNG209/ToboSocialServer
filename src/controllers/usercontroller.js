@@ -8,10 +8,10 @@ const {
     logoutUserService,
     forgotPasswordService,
     registerUserService,
-    getUserById,
     searchUserService,
     getUserPostsByUserId,
-    getUserByIdv2
+    getUserByIdv2,
+    getUserProfileService
 } = require("../services/userService");
 
 module.exports = {
@@ -36,8 +36,17 @@ module.exports = {
 
     getUserByIdAPIv2: async (req, res) => {
         const id = req.params.id;
-        const { currentUserId } = req.query;
-        const rs = await getUserByIdv2(id, currentUserId); // trả về có follow hay chưa
+        const userId = req.user.id; // Lấy từ accessToken
+        const rs = await getUserByIdv2(id, userId); // trả về có follow hay chưa
+        if (!rs) {
+            return res.status(404).json({ errorCode: 1, message: 'User not found' });
+        }
+        res.status(200).json({ errorCode: 0, result: rs });
+    },
+
+    getUserProfile: async (req, res) => {
+        const userId = req.user.id; // Lấy từ accessToken
+        const rs = await getUserProfileService(userId);
         if (!rs) {
             return res.status(404).json({ errorCode: 1, message: 'User not found' });
         }
